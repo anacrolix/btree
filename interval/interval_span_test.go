@@ -25,7 +25,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ajwerner/btree/internal/abstract"
+	"github.com/anacrolix/btree/internal/abstract"
 	"github.com/stretchr/testify/require"
 )
 

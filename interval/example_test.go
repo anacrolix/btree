@@ -18,7 +18,7 @@ import (
 	"cmp"
 	"fmt"
 
-	"github.com/ajwerner/btree/interval"
+	"github.com/anacrolix/btree/interval"
 )
 
 type pair[T cmp.Ordered] [2]T
