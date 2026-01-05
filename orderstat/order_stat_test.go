@@ -88,7 +88,7 @@ func TestOrderStatNth(t *testing.T) {
 
 }
 
-func ExampleBlog() {
+func Example() {
 	s := MakeSet(cmp.Compare[int])
 	for _, i := range rand.Perm(100) {
 		s.Upsert(i)
