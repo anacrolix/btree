@@ -160,11 +160,18 @@ func (t *Map[K, V, A]) Len() int {
 }
 
 // Get returns the value associated with the requested key, if it exists.
+// It performs a direct tree walk without allocating an iterator.
 func (t *Map[K, V, A]) Get(k K) (v V, ok bool) {
-	it := t.Iterator()
-	it.SeekGE(k)
-	if it.Valid() && it.Compare(it.Cur(), k) == 0 {
-		return it.Value(), true
+	n := t.root
+	for n != nil {
+		i, found := n.find(t.cfg.cmp, k)
+		if found {
+			return n.values[i], true
+		}
+		if n.IsLeaf() {
+			break
+		}
+		n = n.children[i]
 	}
 	return v, false
 }
