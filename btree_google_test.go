@@ -573,6 +573,176 @@ func TestDescendRangeGaps(t *testing.T) {
 	}
 }
 
+// --- Tests ported / inspired from tidwall/btree ---
+
+// TestReset verifies that Reset() empties the tree and it can be repopulated.
+func TestReset(t *testing.T) {
+	tr := newSet()
+	for i := 0; i < 100; i++ {
+		tr.Upsert(i)
+	}
+	if tr.Len() != 100 {
+		t.Fatalf("want 100, got %d", tr.Len())
+	}
+	tr.Reset()
+	if tr.Len() != 0 {
+		t.Fatalf("after Reset: want 0, got %d", tr.Len())
+	}
+	// Ensure the tree is fully functional after reset.
+	for i := 0; i < 100; i++ {
+		tr.Upsert(i)
+	}
+	if tr.Len() != 100 {
+		t.Fatalf("after repopulate: want 100, got %d", tr.Len())
+	}
+	if got := all(&tr); !reflect.DeepEqual(got, rang(100)) {
+		t.Fatalf("order after repopulate: got %v…", got[:10])
+	}
+}
+
+// TestSeekMissingKey inserts only even numbers and verifies that SeekGE and
+// SeekLT for an odd (absent) key land on the correct neighbours, and that
+// subsequent Next/Prev scans produce the right sequence.
+// Inspired by tidwall/btree TestGenericIterSeek.
+func TestSeekMissingKey(t *testing.T) {
+	tr := newSet()
+	for i := 0; i < 10000; i++ {
+		tr.Upsert(i * 2) // 0, 2, 4, …, 19998
+	}
+	it := tr.Iterator()
+
+	// SeekGE(501) should land on 502 (next even ≥ 501).
+	it.SeekGE(501)
+	if !it.Valid() || it.Cur() != 502 {
+		t.Fatalf("SeekGE(501): want 502, got valid=%v cur=%v", it.Valid(), it.Cur())
+	}
+	it.Next()
+	if !it.Valid() || it.Cur() != 504 {
+		t.Fatalf("SeekGE(501)+Next: want 504, got %v", it.Cur())
+	}
+
+	// SeekGE(501) then Prev should go to 502 then 500.
+	it.SeekGE(501)
+	if !it.Valid() || it.Cur() != 502 {
+		t.Fatalf("SeekGE(501): want 502, got %v", it.Cur())
+	}
+	it.Prev()
+	if !it.Valid() || it.Cur() != 500 {
+		t.Fatalf("SeekGE(501)+Prev: want 500, got %v", it.Cur())
+	}
+
+	// SeekLT(501) should land on 500.
+	it.SeekLT(501)
+	if !it.Valid() || it.Cur() != 500 {
+		t.Fatalf("SeekLT(501): want 500, got valid=%v cur=%v", it.Valid(), it.Cur())
+	}
+	it.Prev()
+	if !it.Valid() || it.Cur() != 498 {
+		t.Fatalf("SeekLT(501)+Prev: want 498, got %v", it.Cur())
+	}
+}
+
+// TestIteratorFullScan performs a full forward scan, a full backward scan, and
+// a mid-scan direction reversal across a multi-level tree (N = 1 000 elements
+// exceeds a single leaf, exercising leaf-boundary crossings in Next/Prev).
+// Inspired by tidwall/btree TestIter.
+func TestIteratorFullScan(t *testing.T) {
+	const N = 1000
+	sorted := rang(N)
+	tr := newSet()
+	for _, v := range perm(N) {
+		tr.Upsert(v)
+	}
+	it := tr.Iterator()
+
+	// Full forward scan.
+	var got []int
+	for it.First(); it.Valid(); it.Next() {
+		got = append(got, it.Cur())
+	}
+	if !reflect.DeepEqual(got, sorted) {
+		t.Fatalf("forward scan mismatch at len %d", len(got))
+	}
+
+	// Full backward scan.
+	got = got[:0]
+	for it.Last(); it.Valid(); it.Prev() {
+		got = append(got, it.Cur())
+	}
+	want := rangrev(N)
+	if !reflect.DeepEqual(got, want) {
+		t.Fatalf("backward scan mismatch at len %d", len(got))
+	}
+
+	// Forward scan to midpoint, then switch to backward.
+	var fwd, bwd []int
+	for it.First(); it.Valid(); it.Next() {
+		fwd = append(fwd, it.Cur())
+		if it.Cur() == N/2 {
+			for it.Prev(); it.Valid(); it.Prev() {
+				bwd = append(bwd, it.Cur())
+			}
+			break
+		}
+	}
+	if len(fwd) != N/2+1 {
+		t.Fatalf("forward half: want %d elems, got %d", N/2+1, len(fwd))
+	}
+	if len(bwd) != N/2 {
+		t.Fatalf("backward half: want %d elems, got %d", N/2, len(bwd))
+	}
+	for i, v := range bwd {
+		if v != N/2-1-i {
+			t.Fatalf("backward[%d]: want %d, got %d", i, N/2-1-i, v)
+		}
+	}
+}
+
+// TestRandomStress inserts N random keys, verifies strictly ascending order,
+// then deletes them all in insertion order and verifies the tree empties.
+// Inspired by tidwall/btree TestGenericSimpleRandom.
+func TestRandomStress(t *testing.T) {
+	const N = 10000
+	keys := perm(N)
+	tr := newSet()
+	for _, k := range keys {
+		tr.Upsert(k)
+	}
+	if tr.Len() != N {
+		t.Fatalf("len after insert: want %d, got %d", N, tr.Len())
+	}
+	// Verify strictly ascending order via full scan.
+	it := tr.Iterator()
+	prev := -1
+	count := 0
+	for it.First(); it.Valid(); it.Next() {
+		v := it.Cur()
+		if v <= prev {
+			t.Fatalf("order violation: %d after %d", v, prev)
+		}
+		prev = v
+		count++
+	}
+	if count != N {
+		t.Fatalf("scan count: want %d, got %d", N, count)
+	}
+	// Delete all keys in insertion order.
+	for _, k := range keys {
+		if removed := tr.Delete(k); !removed {
+			t.Fatalf("Delete(%d) = false, expected true", k)
+		}
+	}
+	if tr.Len() != 0 {
+		t.Fatalf("len after delete all: want 0, got %d", tr.Len())
+	}
+	// Double-delete should return false.
+	for _, k := range keys[:10] {
+		if removed := tr.Delete(k); removed {
+			t.Fatalf("double-Delete(%d) returned true", k)
+		}
+	}
+}
+
 // --- Benchmarks (all from google/btree) ---
 
 const benchmarkTreeSize = 10000
