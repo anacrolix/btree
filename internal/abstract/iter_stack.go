@@ -17,9 +17,14 @@ package abstract
 
 // iterStack represents a stack of (node, pos) tuples, which captures
 // iteration state as an Iterator descends a AugBTree.
+//
+// When lazy is true the stack has not been populated: SeekGE/SeekLT performed
+// a direct tree walk without pushing ancestor frames.  The first call to
+// Next/Prev will rebuild the stack by re-seeking with full frame recording.
 type iterStack[K, V, A any] struct {
 	a    iterStackArr[K, V, A]
 	aLen int16 // -1 when using s
+	lazy bool  // stack not yet built (lazy seek was used)
 	s    []iterFrame[K, V, A]
 }
 
@@ -65,9 +70,18 @@ func (is *iterStack[K, V, A]) len() int {
 }
 
 func (is *iterStack[K, V, A]) reset() {
+	is.lazy = false
 	if is.aLen == -1 {
 		is.s = is.s[:0]
 	} else {
 		is.aLen = 0
 	}
+}
+
+// setLazy marks the stack as not yet built.  aLen is reset to 0 so that if
+// the stack is later promoted to eager mode the inline array is ready.
+func (is *iterStack[K, V, A]) setLazy() {
+	is.lazy = true
+	is.aLen = 0
+	is.s = nil
 }
