@@ -33,12 +33,14 @@ const (
 // BTree is the common interface satisfied by all three adapters.
 type BTree interface {
 	Insert(k int)
+	Upsert(k int) (overwrote bool) // insert or update; reports whether the key already existed
 	Delete(k int) bool
 	Get(k int) bool
 	Len() int
 	Reset()
-	Clone() BTree // ajwerner uses O(1) lazy clone; others perform a full copy
-	Seek(k int) bool // true if any item >= k exists
+	Clone() BTree     // ajwerner uses O(1) lazy clone; others perform a full copy
+	NewCursor() Cursor // ajwerner uses a native iterator; others use a snapshot slice
+	Seek(k int) bool   // true if any item >= k exists
 	Ascend(fn func(k int) bool)
 	Descend(fn func(k int) bool)
 	AscendFrom(ge int, fn func(k int) bool)
@@ -49,6 +51,21 @@ type BTree interface {
 	Max() (int, bool)
 	DeleteMin() (int, bool)
 	DeleteMax() (int, bool)
+}
+
+// Cursor supports bidirectional navigation and seeking within a tree.
+// ajwerner's implementation is a live iterator; tidwall's and google's are
+// snapshot-backed (populated at NewCursor time) since their APIs are
+// callback-based with no native bidirectional cursor.
+type Cursor interface {
+	First()
+	Last()
+	SeekGE(k int) // position at first item >= k
+	SeekLT(k int) // position at last item < k
+	Next()
+	Prev()
+	Valid() bool
+	Cur() int
 }
 
 // ===== ajwerner/btree adapter =====
@@ -63,6 +80,11 @@ func newAjwerner() BTree {
 
 func (a *ajwernerAdapter) Insert(k int) { a.m.Upsert(k, struct{}{}) }
 
+func (a *ajwernerAdapter) Upsert(k int) (overwrote bool) {
+	_, _, overwrote = a.m.Upsert(k, struct{}{})
+	return overwrote
+}
+
 func (a *ajwernerAdapter) Delete(k int) bool {
 	_, _, ok := a.m.Delete(k)
 	return ok
@@ -75,6 +97,24 @@ func (a *ajwernerAdapter) Reset()          { a.m.Reset() }
 func (a *ajwernerAdapter) Clone() BTree {
 	return &ajwernerAdapter{m: a.m.Clone()}
 }
+
+func (a *ajwernerAdapter) NewCursor() Cursor {
+	it := a.m.Iterator()
+	return &ajwernerCursor{it: it}
+}
+
+type ajwernerCursor struct {
+	it ajwernerbtree.MapIterator[int, struct{}]
+}
+
+func (c *ajwernerCursor) First()       { c.it.First() }
+func (c *ajwernerCursor) Last()        { c.it.Last() }
+func (c *ajwernerCursor) SeekGE(k int) { c.it.SeekGE(k) }
+func (c *ajwernerCursor) SeekLT(k int) { c.it.SeekLT(k) }
+func (c *ajwernerCursor) Next()        { c.it.Next() }
+func (c *ajwernerCursor) Prev()        { c.it.Prev() }
+func (c *ajwernerCursor) Valid() bool  { return c.it.Valid() }
+func (c *ajwernerCursor) Cur() int     { return c.it.Cur() }
 
 func (a *ajwernerAdapter) Seek(k int) bool {
 	it := a.m.Iterator()
@@ -198,6 +238,43 @@ type tidwallAdapter struct {
 
 func newTidwall() BTree { return &tidwallAdapter{} }
 
+// sliceCursor is a snapshot-backed cursor for trees without a native
+// bidirectional iterator. Items are collected at construction time.
+type sliceCursor struct {
+	items []int
+	pos   int // valid range: [0, len-1]; -1 = before-first; len = after-last
+}
+
+func newSliceCursor(items []int) *sliceCursor {
+	return &sliceCursor{items: items, pos: -1}
+}
+
+func (c *sliceCursor) First() { c.pos = 0 }
+func (c *sliceCursor) Last()  { c.pos = len(c.items) - 1 }
+
+func (c *sliceCursor) SeekGE(k int) {
+	c.pos = sort.SearchInts(c.items, k) // first index where items[pos] >= k
+}
+
+func (c *sliceCursor) SeekLT(k int) {
+	c.pos = sort.SearchInts(c.items, k) - 1 // last index where items[pos] < k
+}
+
+func (c *sliceCursor) Next() {
+	if c.pos < len(c.items) {
+		c.pos++
+	}
+}
+
+func (c *sliceCursor) Prev() {
+	if c.pos > -1 {
+		c.pos--
+	}
+}
+
+func (c *sliceCursor) Valid() bool { return c.pos >= 0 && c.pos < len(c.items) }
+func (c *sliceCursor) Cur() int    { return c.items[c.pos] }
+
 func (a *tidwallAdapter) Insert(k int) { a.m.Set(k, struct{}{}) }
 
 func (a *tidwallAdapter) Delete(k int) bool {
@@ -254,6 +331,18 @@ func (a *tidwallAdapter) Max() (int, bool) { k, _, ok := a.m.Max(); return k, ok
 
 func (a *tidwallAdapter) DeleteMin() (int, bool) { k, _, ok := a.m.PopMin(); return k, ok }
 func (a *tidwallAdapter) DeleteMax() (int, bool) { k, _, ok := a.m.PopMax(); return k, ok }
+
+func (a *tidwallAdapter) Upsert(k int) (overwrote bool) {
+	_, overwrote = a.m.Get(k)
+	a.m.Set(k, struct{}{})
+	return overwrote
+}
+
+func (a *tidwallAdapter) NewCursor() Cursor {
+	var items []int
+	a.m.Scan(func(k int, _ struct{}) bool { items = append(items, k); return true })
+	return newSliceCursor(items)
+}
 
 func (a *tidwallAdapter) Clone() BTree {
 	clone := &tidwallAdapter{}
@@ -319,6 +408,17 @@ func (a *googleAdapter) Max() (int, bool) { return a.t.Max() }
 
 func (a *googleAdapter) DeleteMin() (int, bool) { return a.t.DeleteMin() }
 func (a *googleAdapter) DeleteMax() (int, bool) { return a.t.DeleteMax() }
+
+func (a *googleAdapter) Upsert(k int) (overwrote bool) {
+	_, overwrote = a.t.ReplaceOrInsert(k)
+	return overwrote
+}
+
+func (a *googleAdapter) NewCursor() Cursor {
+	var items []int
+	a.t.Ascend(func(k int) bool { items = append(items, k); return true })
+	return newSliceCursor(items)
+}
 
 func (a *googleAdapter) Clone() BTree {
 	clone := &googleAdapter{t: googlebtree.NewG[int](32, a.less), less: a.less}
@@ -412,11 +512,18 @@ func TestBTreeFull(t *testing.T) {
 				t.Fatal("empty tree should have no max")
 			}
 			for _, item := range perm(treeSize) {
-				tr.Insert(item)
+				if tr.Upsert(item) {
+					t.Fatal("insert found existing item", item)
+				}
 			}
 			for _, item := range perm(treeSize) {
 				if !tr.Get(item) {
 					t.Fatal("get did not find item", item)
+				}
+			}
+			for _, item := range perm(treeSize) {
+				if !tr.Upsert(item) {
+					t.Fatal("upsert of existing item should report overwrote", item)
 				}
 			}
 			if min, ok := tr.Min(); !ok || min != 0 {
@@ -715,6 +822,148 @@ func TestReset(t *testing.T) {
 	})
 }
 
+func TestSeekBoundaries(t *testing.T) {
+	forEachImpl(t, func(t *testing.T, tr BTree) {
+		for _, v := range rang(10) {
+			tr.Insert(v)
+		}
+		it := tr.NewCursor()
+
+		it.SeekGE(100)
+		if it.Valid() {
+			t.Errorf("SeekGE(100) should be invalid, got %v", it.Cur())
+		}
+		it.SeekLT(0)
+		if it.Valid() {
+			t.Errorf("SeekLT(0) should be invalid, got %v", it.Cur())
+		}
+		it.SeekGE(0)
+		if !it.Valid() || it.Cur() != 0 {
+			t.Errorf("SeekGE(0): valid=%v cur=%v", it.Valid(), it.Cur())
+		}
+		it.SeekGE(9)
+		if !it.Valid() || it.Cur() != 9 {
+			t.Errorf("SeekGE(9): valid=%v cur=%v", it.Valid(), it.Cur())
+		}
+		it.SeekLT(10)
+		if !it.Valid() || it.Cur() != 9 {
+			t.Errorf("SeekLT(10): valid=%v cur=%v", it.Valid(), it.Cur())
+		}
+		it.SeekLT(1)
+		if !it.Valid() || it.Cur() != 0 {
+			t.Errorf("SeekLT(1): valid=%v cur=%v", it.Valid(), it.Cur())
+		}
+	})
+}
+
+func TestIteratorBidirectional(t *testing.T) {
+	forEachImpl(t, func(t *testing.T, tr BTree) {
+		for _, v := range rang(10) {
+			tr.Insert(v)
+		}
+		it := tr.NewCursor()
+		it.First()
+		for range 5 {
+			it.Next()
+		}
+		if it.Cur() != 5 {
+			t.Fatalf("after 5 Next: want 5, got %v", it.Cur())
+		}
+		for range 3 {
+			it.Prev()
+		}
+		if it.Cur() != 2 {
+			t.Fatalf("after 3 Prev: want 2, got %v", it.Cur())
+		}
+	})
+}
+
+func TestSeekMissingKey(t *testing.T) {
+	forEachImpl(t, func(t *testing.T, tr BTree) {
+		for i := range 10000 {
+			tr.Insert(i * 2) // 0, 2, 4, …, 19998
+		}
+		it := tr.NewCursor()
+
+		it.SeekGE(501)
+		if !it.Valid() || it.Cur() != 502 {
+			t.Fatalf("SeekGE(501): want 502, got valid=%v cur=%v", it.Valid(), it.Cur())
+		}
+		it.Next()
+		if !it.Valid() || it.Cur() != 504 {
+			t.Fatalf("SeekGE(501)+Next: want 504, got %v", it.Cur())
+		}
+
+		it.SeekGE(501)
+		if !it.Valid() || it.Cur() != 502 {
+			t.Fatalf("SeekGE(501): want 502, got %v", it.Cur())
+		}
+		it.Prev()
+		if !it.Valid() || it.Cur() != 500 {
+			t.Fatalf("SeekGE(501)+Prev: want 500, got %v", it.Cur())
+		}
+
+		it.SeekLT(501)
+		if !it.Valid() || it.Cur() != 500 {
+			t.Fatalf("SeekLT(501): want 500, got valid=%v cur=%v", it.Valid(), it.Cur())
+		}
+		it.Prev()
+		if !it.Valid() || it.Cur() != 498 {
+			t.Fatalf("SeekLT(501)+Prev: want 498, got %v", it.Cur())
+		}
+	})
+}
+
+func TestIteratorFullScan(t *testing.T) {
+	forEachImpl(t, func(t *testing.T, tr BTree) {
+		const N = 1000
+		sorted := rang(N)
+		for _, v := range perm(N) {
+			tr.Insert(v)
+		}
+		it := tr.NewCursor()
+
+		var got []int
+		for it.First(); it.Valid(); it.Next() {
+			got = append(got, it.Cur())
+		}
+		if !reflect.DeepEqual(got, sorted) {
+			t.Fatalf("forward scan mismatch at len %d", len(got))
+		}
+
+		got = got[:0]
+		for it.Last(); it.Valid(); it.Prev() {
+			got = append(got, it.Cur())
+		}
+		want := rangrev(N)
+		if !reflect.DeepEqual(got, want) {
+			t.Fatalf("backward scan mismatch at len %d", len(got))
+		}
+
+		var fwd, bwd []int
+		for it.First(); it.Valid(); it.Next() {
+			fwd = append(fwd, it.Cur())
+			if it.Cur() == N/2 {
+				for it.Prev(); it.Valid(); it.Prev() {
+					bwd = append(bwd, it.Cur())
+				}
+				break
+			}
+		}
+		if len(fwd) != N/2+1 {
+			t.Fatalf("forward half: want %d elems, got %d", N/2+1, len(fwd))
+		}
+		if len(bwd) != N/2 {
+			t.Fatalf("backward half: want %d elems, got %d", N/2, len(bwd))
+		}
+		for i, v := range bwd {
+			if v != N/2-1-i {
+				t.Fatalf("backward[%d]: want %d, got %d", i, N/2-1-i, v)
+			}
+		}
+	})
+}
+
 func TestRandomStress(t *testing.T) {
 	forEachImpl(t, func(t *testing.T, tr BTree) {
 		const N = 10000
@@ -846,8 +1095,10 @@ func BenchmarkSeek(b *testing.B) {
 				tr.Insert(item)
 			}
 			b.ResetTimer()
-			for i := 0; i < b.N; i++ {
+			i := 0
+			for b.Loop() {
 				tr.Seek(i % size)
+				i++
 			}
 		})
 	}
@@ -862,9 +1113,11 @@ func BenchmarkDeleteInsert(b *testing.B) {
 				tr.Insert(item)
 			}
 			b.ResetTimer()
-			for i := 0; i < b.N; i++ {
+			i := 0
+			for b.Loop() {
 				tr.Delete(insertP[i%benchmarkTreeSize])
 				tr.Insert(insertP[i%benchmarkTreeSize])
+				i++
 			}
 		})
 	}
@@ -883,9 +1136,11 @@ func BenchmarkDeleteInsertCloneOnce(b *testing.B) {
 			}
 			tr = tr.Clone()
 			b.ResetTimer()
-			for i := 0; i < b.N; i++ {
+			i := 0
+			for b.Loop() {
 				tr.Delete(insertP[i%benchmarkTreeSize])
 				tr.Insert(insertP[i%benchmarkTreeSize])
+				i++
 			}
 		})
 	}
@@ -902,10 +1157,12 @@ func BenchmarkDeleteInsertCloneEachTime(b *testing.B) {
 				tr.Insert(item)
 			}
 			b.ResetTimer()
-			for i := 0; i < b.N; i++ {
+			i := 0
+			for b.Loop() {
 				tr = tr.Clone()
 				tr.Delete(insertP[i%benchmarkTreeSize])
 				tr.Insert(insertP[i%benchmarkTreeSize])
+				i++
 			}
 		})
 	}
@@ -971,7 +1228,7 @@ func BenchmarkAscend(b *testing.B) {
 				tr.Insert(v)
 			}
 			b.ResetTimer()
-			for i := 0; i < b.N; i++ {
+			for b.Loop() {
 				j := 0
 				tr.Ascend(func(k int) bool {
 					if k != arr[j] {
@@ -995,7 +1252,7 @@ func BenchmarkDescend(b *testing.B) {
 				tr.Insert(v)
 			}
 			b.ResetTimer()
-			for i := 0; i < b.N; i++ {
+			for b.Loop() {
 				j := len(arr) - 1
 				tr.Descend(func(k int) bool {
 					if k != arr[j] {
@@ -1019,7 +1276,7 @@ func BenchmarkAscendRange(b *testing.B) {
 				tr.Insert(v)
 			}
 			b.ResetTimer()
-			for i := 0; i < b.N; i++ {
+			for b.Loop() {
 				j := 100
 				hi := arr[len(arr)-100]
 				tr.AscendRange(100, hi, func(k int) bool {
@@ -1047,7 +1304,7 @@ func BenchmarkDescendRange(b *testing.B) {
 				tr.Insert(v)
 			}
 			b.ResetTimer()
-			for i := 0; i < b.N; i++ {
+			for b.Loop() {
 				j := len(arr) - 100
 				pivot := arr[len(arr)-100]
 				tr.DescendRange(pivot, 100, func(k int) bool {
@@ -1075,7 +1332,7 @@ func BenchmarkAscendGreaterOrEqual(b *testing.B) {
 				tr.Insert(v)
 			}
 			b.ResetTimer()
-			for i := 0; i < b.N; i++ {
+			for b.Loop() {
 				j, k := 100, 0
 				tr.AscendFrom(100, func(item int) bool {
 					if item != arr[j] {
@@ -1096,6 +1353,85 @@ func BenchmarkAscendGreaterOrEqual(b *testing.B) {
 	}
 }
 
+func BenchmarkUpsert(b *testing.B) {
+	insertP := perm(benchmarkTreeSize)
+	for _, impl := range impls {
+		b.Run(impl.name, func(b *testing.B) {
+			tr := impl.new()
+			for _, item := range insertP {
+				tr.Insert(item)
+			}
+			b.ResetTimer()
+			i := 0
+			for b.Loop() {
+				tr.Upsert(insertP[i%benchmarkTreeSize])
+				i++
+			}
+		})
+	}
+}
+
+// BenchmarkCursorSeek measures the cost of creating a cursor and seeking to a key.
+func BenchmarkCursorSeek(b *testing.B) {
+	const size = 100000
+	for _, impl := range impls {
+		b.Run(impl.name, func(b *testing.B) {
+			tr := impl.new()
+			for _, item := range perm(size) {
+				tr.Insert(item)
+			}
+			b.ResetTimer()
+			i := 0
+			for b.Loop() {
+				c := tr.NewCursor()
+				c.SeekGE(i % size)
+				i++
+			}
+		})
+	}
+}
+
+// BenchmarkCursorNext measures the cost of a single Next step on a live cursor.
+func BenchmarkCursorNext(b *testing.B) {
+	const size = 100000
+	for _, impl := range impls {
+		b.Run(impl.name, func(b *testing.B) {
+			tr := impl.new()
+			for _, item := range perm(size) {
+				tr.Insert(item)
+			}
+			b.ResetTimer()
+			c := tr.NewCursor()
+			c.First()
+			for b.Loop() {
+				if !c.Valid() {
+					c.First()
+				}
+				c.Next()
+			}
+		})
+	}
+}
+
+// BenchmarkCursorAscend measures full forward iteration via a cursor.
+func BenchmarkCursorAscend(b *testing.B) {
+	const size = 100000
+	for _, impl := range impls {
+		b.Run(impl.name, func(b *testing.B) {
+			tr := impl.new()
+			for _, item := range perm(size) {
+				tr.Insert(item)
+			}
+			b.ResetTimer()
+			for b.Loop() {
+				c := tr.NewCursor()
+				for c.First(); c.Valid(); c.Next() {
+				}
+			}
+		})
+	}
+}
+
 func BenchmarkDescendLessOrEqual(b *testing.B) {
 	arr := perm(benchmarkTreeSize)
 	sort.Ints(arr)
@@ -1106,7 +1442,7 @@ func BenchmarkDescendLessOrEqual(b *testing.B) {
 				tr.Insert(v)
 			}
 			b.ResetTimer()
-			for i := 0; i < b.N; i++ {
+			for b.Loop() {
 				j := len(arr) - 100
 				k := len(arr)
 				pivot := arr[len(arr)-100]
