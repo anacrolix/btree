@@ -19,22 +19,11 @@ The `orderstat` package provides order-statistic trees that support O(log n) ran
 
 ## Benchmarks
 
-The `bench/` directory contains comparative benchmarks against [tidwall/btree](https://github.com/tidwall/btree) and [google/btree](https://github.com/google/btree). Four operations are benchmarked: insert, get, delete, and ascending iteration.
+The [`bench/`](bench/) directory contains 22 comparative benchmarks across three groups (Google test suite, Tidwall test suite, Local) against [tidwall/btree](https://github.com/tidwall/btree) and [google/btree](https://github.com/google/btree).
 
-```
-cd bench
-go test -bench=. -benchmem -count=6
-```
+**[Interactive chart](https://htmlpreview.github.io/?https://github.com/anacrolix/btree/blob/main/bench/results/chart.html)** — runtime, B/op, and allocs/op per benchmark.
 
-To compare against another ref using [benchstat](https://pkg.go.dev/golang.org/x/perf/cmd/benchstat):
-
-```
-go test -bench=. -benchmem -count=6 ./bench/ > new.txt
-git stash
-go test -bench=. -benchmem -count=6 ./bench/ > old.txt
-git stash pop
-benchstat old.txt new.txt
-```
+See [`bench/README.md`](bench/README.md) for full results and usage.
 
 ## License
 

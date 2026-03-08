@@ -25,9 +25,10 @@ import (
 )
 
 const (
-	treeSize          = 10000
-	cloneTestSize     = 10000
-	benchmarkTreeSize = 10000
+	treeSize               = 10000
+	cloneTestSize          = 10000
+	benchmarkTreeSize      = 10000
+	benchmarkTreeSizeLarge = 1_000_000
 )
 
 // BTree is the common interface satisfied by all three adapters.
@@ -1067,400 +1068,523 @@ func cloneTestHelper(t *testing.T, tr BTree, start int, p []int, wg *sync.WaitGr
 
 // ===== benchmarks (ported from btree_google_test.go) =====
 
-func BenchmarkInsert(b *testing.B) {
-	insertP := perm(benchmarkTreeSize)
-	for _, impl := range impls {
-		b.Run(impl.name, func(b *testing.B) {
-			i := 0
-			for i < b.N {
+func BenchmarkGoogle(b *testing.B) {
+	b.Run("Insert", func(b *testing.B) {
+		insertP := perm(benchmarkTreeSize)
+		for _, impl := range impls {
+			b.Run(impl.name, func(b *testing.B) {
+				i := 0
+				for i < b.N {
+					tr := impl.new()
+					for _, item := range insertP {
+						tr.Insert(item)
+						i++
+						if i >= b.N {
+							return
+						}
+					}
+				}
+			})
+		}
+	})
+
+	b.Run("Seek", func(b *testing.B) {
+		const size = 100000
+		for _, impl := range impls {
+			b.Run(impl.name, func(b *testing.B) {
+				tr := impl.new()
+				for _, item := range perm(size) {
+					tr.Insert(item)
+				}
+				b.ResetTimer()
+				i := 0
+				for b.Loop() {
+					tr.Seek(i % size)
+					i++
+				}
+			})
+		}
+	})
+
+	b.Run("DeleteInsert", func(b *testing.B) {
+		insertP := perm(benchmarkTreeSize)
+		for _, impl := range impls {
+			b.Run(impl.name, func(b *testing.B) {
 				tr := impl.new()
 				for _, item := range insertP {
 					tr.Insert(item)
-					i++
-					if i >= b.N {
-						return
-					}
 				}
-			}
-		})
-	}
-}
+				b.ResetTimer()
+				i := 0
+				for b.Loop() {
+					tr.Delete(insertP[i%benchmarkTreeSize])
+					tr.Insert(insertP[i%benchmarkTreeSize])
+					i++
+				}
+			})
+		}
+	})
 
-func BenchmarkSeek(b *testing.B) {
-	const size = 100000
-	for _, impl := range impls {
-		b.Run(impl.name, func(b *testing.B) {
-			tr := impl.new()
-			for _, item := range perm(size) {
-				tr.Insert(item)
-			}
-			b.ResetTimer()
-			i := 0
-			for b.Loop() {
-				tr.Seek(i % size)
-				i++
-			}
-		})
-	}
-}
-
-func BenchmarkDeleteInsert(b *testing.B) {
-	insertP := perm(benchmarkTreeSize)
-	for _, impl := range impls {
-		b.Run(impl.name, func(b *testing.B) {
-			tr := impl.new()
-			for _, item := range insertP {
-				tr.Insert(item)
-			}
-			b.ResetTimer()
-			i := 0
-			for b.Loop() {
-				tr.Delete(insertP[i%benchmarkTreeSize])
-				tr.Insert(insertP[i%benchmarkTreeSize])
-				i++
-			}
-		})
-	}
-}
-
-// BenchmarkDeleteInsertCloneOnce clones once then measures steady-state
-// delete+insert. For ajwerner this triggers copy-on-write on first mutation;
-// tidwall and google pay the full copy cost upfront in Clone().
-func BenchmarkDeleteInsertCloneOnce(b *testing.B) {
-	insertP := perm(benchmarkTreeSize)
-	for _, impl := range impls {
-		b.Run(impl.name, func(b *testing.B) {
-			tr := impl.new()
-			for _, item := range insertP {
-				tr.Insert(item)
-			}
-			tr = tr.Clone()
-			b.ResetTimer()
-			i := 0
-			for b.Loop() {
-				tr.Delete(insertP[i%benchmarkTreeSize])
-				tr.Insert(insertP[i%benchmarkTreeSize])
-				i++
-			}
-		})
-	}
-}
-
-// BenchmarkDeleteInsertCloneEachTime clones before every delete+insert,
-// measuring the combined cost of cloning and mutation per operation.
-func BenchmarkDeleteInsertCloneEachTime(b *testing.B) {
-	insertP := perm(benchmarkTreeSize)
-	for _, impl := range impls {
-		b.Run(impl.name, func(b *testing.B) {
-			tr := impl.new()
-			for _, item := range insertP {
-				tr.Insert(item)
-			}
-			b.ResetTimer()
-			i := 0
-			for b.Loop() {
+	// DeleteInsertCloneOnce clones once then measures steady-state delete+insert.
+	// For ajwerner this triggers copy-on-write on first mutation;
+	// tidwall and google pay the full copy cost upfront in Clone().
+	b.Run("DeleteInsertCloneOnce", func(b *testing.B) {
+		insertP := perm(benchmarkTreeSize)
+		for _, impl := range impls {
+			b.Run(impl.name, func(b *testing.B) {
+				tr := impl.new()
+				for _, item := range insertP {
+					tr.Insert(item)
+				}
 				tr = tr.Clone()
-				tr.Delete(insertP[i%benchmarkTreeSize])
-				tr.Insert(insertP[i%benchmarkTreeSize])
-				i++
-			}
-		})
-	}
-}
+				b.ResetTimer()
+				i := 0
+				for b.Loop() {
+					tr.Delete(insertP[i%benchmarkTreeSize])
+					tr.Insert(insertP[i%benchmarkTreeSize])
+					i++
+				}
+			})
+		}
+	})
 
-func BenchmarkDelete(b *testing.B) {
-	insertP := perm(benchmarkTreeSize)
-	removeP := perm(benchmarkTreeSize)
-	for _, impl := range impls {
-		b.Run(impl.name, func(b *testing.B) {
-			i := 0
-			for i < b.N {
-				b.StopTimer()
+	// DeleteInsertCloneEachTime clones before every delete+insert,
+	// measuring the combined cost of cloning and mutation per operation.
+	b.Run("DeleteInsertCloneEachTime", func(b *testing.B) {
+		insertP := perm(benchmarkTreeSize)
+		for _, impl := range impls {
+			b.Run(impl.name, func(b *testing.B) {
 				tr := impl.new()
-				for _, v := range insertP {
+				for _, item := range insertP {
+					tr.Insert(item)
+				}
+				b.ResetTimer()
+				i := 0
+				for b.Loop() {
+					tr = tr.Clone()
+					tr.Delete(insertP[i%benchmarkTreeSize])
+					tr.Insert(insertP[i%benchmarkTreeSize])
+					i++
+				}
+			})
+		}
+	})
+
+	b.Run("Delete", func(b *testing.B) {
+		insertP := perm(benchmarkTreeSize)
+		removeP := perm(benchmarkTreeSize)
+		for _, impl := range impls {
+			b.Run(impl.name, func(b *testing.B) {
+				i := 0
+				for i < b.N {
+					b.StopTimer()
+					tr := impl.new()
+					for _, v := range insertP {
+						tr.Insert(v)
+					}
+					b.StartTimer()
+					for _, item := range removeP {
+						tr.Delete(item)
+						i++
+						if i >= b.N {
+							return
+						}
+					}
+				}
+			})
+		}
+	})
+
+	b.Run("Get", func(b *testing.B) {
+		insertP := perm(benchmarkTreeSize)
+		lookupP := perm(benchmarkTreeSize)
+		for _, impl := range impls {
+			b.Run(impl.name, func(b *testing.B) {
+				i := 0
+				for i < b.N {
+					b.StopTimer()
+					tr := impl.new()
+					for _, v := range insertP {
+						tr.Insert(v)
+					}
+					b.StartTimer()
+					for _, item := range lookupP {
+						tr.Seek(item)
+						i++
+						if i >= b.N {
+							return
+						}
+					}
+				}
+			})
+		}
+	})
+
+	b.Run("Ascend", func(b *testing.B) {
+		arr := perm(benchmarkTreeSize)
+		sort.Ints(arr)
+		for _, impl := range impls {
+			b.Run(impl.name, func(b *testing.B) {
+				tr := impl.new()
+				for _, v := range arr {
 					tr.Insert(v)
 				}
-				b.StartTimer()
-				for _, item := range removeP {
-					tr.Delete(item)
-					i++
-					if i >= b.N {
-						return
-					}
+				b.ResetTimer()
+				for b.Loop() {
+					j := 0
+					tr.Ascend(func(k int) bool {
+						if k != arr[j] {
+							b.Fatalf("mismatch: want %v got %v", arr[j], k)
+						}
+						j++
+						return true
+					})
 				}
-			}
-		})
-	}
-}
+			})
+		}
+	})
 
-func BenchmarkGet(b *testing.B) {
-	insertP := perm(benchmarkTreeSize)
-	lookupP := perm(benchmarkTreeSize)
-	for _, impl := range impls {
-		b.Run(impl.name, func(b *testing.B) {
-			i := 0
-			for i < b.N {
-				b.StopTimer()
+	b.Run("Descend", func(b *testing.B) {
+		arr := perm(benchmarkTreeSize)
+		sort.Ints(arr)
+		for _, impl := range impls {
+			b.Run(impl.name, func(b *testing.B) {
 				tr := impl.new()
-				for _, v := range insertP {
+				for _, v := range arr {
 					tr.Insert(v)
 				}
-				b.StartTimer()
-				for _, item := range lookupP {
-					tr.Seek(item)
+				b.ResetTimer()
+				for b.Loop() {
+					j := len(arr) - 1
+					tr.Descend(func(k int) bool {
+						if k != arr[j] {
+							b.Fatalf("mismatch: want %v got %v", arr[j], k)
+						}
+						j--
+						return true
+					})
+				}
+			})
+		}
+	})
+
+	b.Run("AscendRange", func(b *testing.B) {
+		arr := perm(benchmarkTreeSize)
+		sort.Ints(arr)
+		for _, impl := range impls {
+			b.Run(impl.name, func(b *testing.B) {
+				tr := impl.new()
+				for _, v := range arr {
+					tr.Insert(v)
+				}
+				b.ResetTimer()
+				for b.Loop() {
+					j := 100
+					hi := arr[len(arr)-100]
+					tr.AscendRange(100, hi, func(k int) bool {
+						if k != arr[j] {
+							b.Fatalf("mismatch: want %v got %v", arr[j], k)
+						}
+						j++
+						return true
+					})
+					if j != len(arr)-100 {
+						b.Fatalf("j: want %v got %v", len(arr)-100, j)
+					}
+				}
+			})
+		}
+	})
+
+	b.Run("DescendRange", func(b *testing.B) {
+		arr := perm(benchmarkTreeSize)
+		sort.Ints(arr)
+		for _, impl := range impls {
+			b.Run(impl.name, func(b *testing.B) {
+				tr := impl.new()
+				for _, v := range arr {
+					tr.Insert(v)
+				}
+				b.ResetTimer()
+				for b.Loop() {
+					j := len(arr) - 100
+					pivot := arr[len(arr)-100]
+					tr.DescendRange(pivot, 100, func(k int) bool {
+						if k != arr[j] {
+							b.Fatalf("mismatch: want %v got %v", arr[j], k)
+						}
+						j--
+						return true
+					})
+					if j != 100 {
+						b.Fatalf("j: want %v got %v", 100, j)
+					}
+				}
+			})
+		}
+	})
+
+	b.Run("AscendGreaterOrEqual", func(b *testing.B) {
+		arr := perm(benchmarkTreeSize)
+		sort.Ints(arr)
+		for _, impl := range impls {
+			b.Run(impl.name, func(b *testing.B) {
+				tr := impl.new()
+				for _, v := range arr {
+					tr.Insert(v)
+				}
+				b.ResetTimer()
+				for b.Loop() {
+					j, k := 100, 0
+					tr.AscendFrom(100, func(item int) bool {
+						if item != arr[j] {
+							b.Fatalf("mismatch: want %v got %v", arr[j], item)
+						}
+						j++
+						k++
+						return true
+					})
+					if j != len(arr) {
+						b.Fatalf("j: want %v got %v", len(arr), j)
+					}
+					if k != len(arr)-100 {
+						b.Fatalf("k: want %v got %v", len(arr)-100, k)
+					}
+				}
+			})
+		}
+	})
+
+	b.Run("DescendLessOrEqual", func(b *testing.B) {
+		arr := perm(benchmarkTreeSize)
+		sort.Ints(arr)
+		for _, impl := range impls {
+			b.Run(impl.name, func(b *testing.B) {
+				tr := impl.new()
+				for _, v := range arr {
+					tr.Insert(v)
+				}
+				b.ResetTimer()
+				for b.Loop() {
+					j := len(arr) - 100
+					k := len(arr)
+					pivot := arr[len(arr)-100]
+					tr.DescendFrom(pivot, func(item int) bool {
+						if item != arr[j] {
+							b.Fatalf("mismatch: want %v got %v", arr[j], item)
+						}
+						j--
+						k--
+						return true
+					})
+					if j != -1 {
+						b.Fatalf("j: want -1 got %v", j)
+					}
+					if k != 99 {
+						b.Fatalf("k: want 99 got %v", k)
+					}
+				}
+			})
+		}
+	})
+}
+
+// ===== benchmarks (original) =====
+
+func BenchmarkLocal(b *testing.B) {
+	b.Run("Upsert", func(b *testing.B) {
+		insertP := perm(benchmarkTreeSize)
+		for _, impl := range impls {
+			b.Run(impl.name, func(b *testing.B) {
+				tr := impl.new()
+				for _, item := range insertP {
+					tr.Insert(item)
+				}
+				b.ResetTimer()
+				i := 0
+				for b.Loop() {
+					tr.Upsert(insertP[i%benchmarkTreeSize])
 					i++
-					if i >= b.N {
-						return
-					}
 				}
-			}
-		})
-	}
-}
+			})
+		}
+	})
 
-func BenchmarkAscend(b *testing.B) {
-	arr := perm(benchmarkTreeSize)
-	sort.Ints(arr)
-	for _, impl := range impls {
-		b.Run(impl.name, func(b *testing.B) {
-			tr := impl.new()
-			for _, v := range arr {
-				tr.Insert(v)
-			}
-			b.ResetTimer()
-			for b.Loop() {
-				j := 0
-				tr.Ascend(func(k int) bool {
-					if k != arr[j] {
-						b.Fatalf("mismatch: want %v got %v", arr[j], k)
-					}
-					j++
-					return true
-				})
-			}
-		})
-	}
-}
-
-func BenchmarkDescend(b *testing.B) {
-	arr := perm(benchmarkTreeSize)
-	sort.Ints(arr)
-	for _, impl := range impls {
-		b.Run(impl.name, func(b *testing.B) {
-			tr := impl.new()
-			for _, v := range arr {
-				tr.Insert(v)
-			}
-			b.ResetTimer()
-			for b.Loop() {
-				j := len(arr) - 1
-				tr.Descend(func(k int) bool {
-					if k != arr[j] {
-						b.Fatalf("mismatch: want %v got %v", arr[j], k)
-					}
-					j--
-					return true
-				})
-			}
-		})
-	}
-}
-
-func BenchmarkAscendRange(b *testing.B) {
-	arr := perm(benchmarkTreeSize)
-	sort.Ints(arr)
-	for _, impl := range impls {
-		b.Run(impl.name, func(b *testing.B) {
-			tr := impl.new()
-			for _, v := range arr {
-				tr.Insert(v)
-			}
-			b.ResetTimer()
-			for b.Loop() {
-				j := 100
-				hi := arr[len(arr)-100]
-				tr.AscendRange(100, hi, func(k int) bool {
-					if k != arr[j] {
-						b.Fatalf("mismatch: want %v got %v", arr[j], k)
-					}
-					j++
-					return true
-				})
-				if j != len(arr)-100 {
-					b.Fatalf("j: want %v got %v", len(arr)-100, j)
+	// CursorSeek measures the cost of creating a cursor and seeking to a key.
+	b.Run("CursorSeek", func(b *testing.B) {
+		const size = 100000
+		for _, impl := range impls {
+			b.Run(impl.name, func(b *testing.B) {
+				tr := impl.new()
+				for _, item := range perm(size) {
+					tr.Insert(item)
 				}
-			}
-		})
-	}
-}
-
-func BenchmarkDescendRange(b *testing.B) {
-	arr := perm(benchmarkTreeSize)
-	sort.Ints(arr)
-	for _, impl := range impls {
-		b.Run(impl.name, func(b *testing.B) {
-			tr := impl.new()
-			for _, v := range arr {
-				tr.Insert(v)
-			}
-			b.ResetTimer()
-			for b.Loop() {
-				j := len(arr) - 100
-				pivot := arr[len(arr)-100]
-				tr.DescendRange(pivot, 100, func(k int) bool {
-					if k != arr[j] {
-						b.Fatalf("mismatch: want %v got %v", arr[j], k)
-					}
-					j--
-					return true
-				})
-				if j != 100 {
-					b.Fatalf("j: want %v got %v", 100, j)
+				b.ResetTimer()
+				i := 0
+				for b.Loop() {
+					c := tr.NewCursor()
+					c.SeekGE(i % size)
+					i++
 				}
-			}
-		})
-	}
-}
+			})
+		}
+	})
 
-func BenchmarkAscendGreaterOrEqual(b *testing.B) {
-	arr := perm(benchmarkTreeSize)
-	sort.Ints(arr)
-	for _, impl := range impls {
-		b.Run(impl.name, func(b *testing.B) {
-			tr := impl.new()
-			for _, v := range arr {
-				tr.Insert(v)
-			}
-			b.ResetTimer()
-			for b.Loop() {
-				j, k := 100, 0
-				tr.AscendFrom(100, func(item int) bool {
-					if item != arr[j] {
-						b.Fatalf("mismatch: want %v got %v", arr[j], item)
-					}
-					j++
-					k++
-					return true
-				})
-				if j != len(arr) {
-					b.Fatalf("j: want %v got %v", len(arr), j)
+	// CursorNext measures the cost of a single Next step on a live cursor.
+	b.Run("CursorNext", func(b *testing.B) {
+		const size = 100000
+		for _, impl := range impls {
+			b.Run(impl.name, func(b *testing.B) {
+				tr := impl.new()
+				for _, item := range perm(size) {
+					tr.Insert(item)
 				}
-				if k != len(arr)-100 {
-					b.Fatalf("k: want %v got %v", len(arr)-100, k)
-				}
-			}
-		})
-	}
-}
-
-func BenchmarkUpsert(b *testing.B) {
-	insertP := perm(benchmarkTreeSize)
-	for _, impl := range impls {
-		b.Run(impl.name, func(b *testing.B) {
-			tr := impl.new()
-			for _, item := range insertP {
-				tr.Insert(item)
-			}
-			b.ResetTimer()
-			i := 0
-			for b.Loop() {
-				tr.Upsert(insertP[i%benchmarkTreeSize])
-				i++
-			}
-		})
-	}
-}
-
-// BenchmarkCursorSeek measures the cost of creating a cursor and seeking to a key.
-func BenchmarkCursorSeek(b *testing.B) {
-	const size = 100000
-	for _, impl := range impls {
-		b.Run(impl.name, func(b *testing.B) {
-			tr := impl.new()
-			for _, item := range perm(size) {
-				tr.Insert(item)
-			}
-			b.ResetTimer()
-			i := 0
-			for b.Loop() {
+				b.ResetTimer()
 				c := tr.NewCursor()
-				c.SeekGE(i % size)
-				i++
-			}
-		})
-	}
-}
-
-// BenchmarkCursorNext measures the cost of a single Next step on a live cursor.
-func BenchmarkCursorNext(b *testing.B) {
-	const size = 100000
-	for _, impl := range impls {
-		b.Run(impl.name, func(b *testing.B) {
-			tr := impl.new()
-			for _, item := range perm(size) {
-				tr.Insert(item)
-			}
-			b.ResetTimer()
-			c := tr.NewCursor()
-			c.First()
-			for b.Loop() {
-				if !c.Valid() {
-					c.First()
-				}
-				c.Next()
-			}
-		})
-	}
-}
-
-// BenchmarkCursorAscend measures full forward iteration via a cursor.
-func BenchmarkCursorAscend(b *testing.B) {
-	const size = 100000
-	for _, impl := range impls {
-		b.Run(impl.name, func(b *testing.B) {
-			tr := impl.new()
-			for _, item := range perm(size) {
-				tr.Insert(item)
-			}
-			b.ResetTimer()
-			for b.Loop() {
-				c := tr.NewCursor()
-				for c.First(); c.Valid(); c.Next() {
-				}
-			}
-		})
-	}
-}
-
-func BenchmarkDescendLessOrEqual(b *testing.B) {
-	arr := perm(benchmarkTreeSize)
-	sort.Ints(arr)
-	for _, impl := range impls {
-		b.Run(impl.name, func(b *testing.B) {
-			tr := impl.new()
-			for _, v := range arr {
-				tr.Insert(v)
-			}
-			b.ResetTimer()
-			for b.Loop() {
-				j := len(arr) - 100
-				k := len(arr)
-				pivot := arr[len(arr)-100]
-				tr.DescendFrom(pivot, func(item int) bool {
-					if item != arr[j] {
-						b.Fatalf("mismatch: want %v got %v", arr[j], item)
+				c.First()
+				for b.Loop() {
+					if !c.Valid() {
+						c.First()
 					}
-					j--
-					k--
-					return true
-				})
-				if j != -1 {
-					b.Fatalf("j: want -1 got %v", j)
+					c.Next()
 				}
-				if k != 99 {
-					b.Fatalf("k: want 99 got %v", k)
+			})
+		}
+	})
+
+	// CursorAscend measures full forward iteration via a cursor.
+	b.Run("CursorAscend", func(b *testing.B) {
+		const size = 100000
+		for _, impl := range impls {
+			b.Run(impl.name, func(b *testing.B) {
+				tr := impl.new()
+				for _, item := range perm(size) {
+					tr.Insert(item)
 				}
-			}
-		})
-	}
+				b.ResetTimer()
+				for b.Loop() {
+					c := tr.NewCursor()
+					for c.First(); c.Valid(); c.Next() {
+					}
+				}
+			})
+		}
+	})
+}
+
+// ===== benchmarks (from tidwall/btree-benchmark) =====
+
+func BenchmarkTidwall(b *testing.B) {
+	// InsertSeq inserts items in ascending sorted order.
+	b.Run("InsertSeq", func(b *testing.B) {
+		insertSeq := rang(benchmarkTreeSizeLarge)
+		for _, impl := range impls {
+			b.Run(impl.name, func(b *testing.B) {
+				i := 0
+				for i < b.N {
+					tr := impl.new()
+					for _, item := range insertSeq {
+						tr.Insert(item)
+						i++
+						if i >= b.N {
+							return
+						}
+					}
+				}
+			})
+		}
+	})
+
+	// GetSeq populates with random order then looks up keys in sequential order.
+	b.Run("GetSeq", func(b *testing.B) {
+		const size = benchmarkTreeSizeLarge
+		lookupSeq := rang(size)
+		for _, impl := range impls {
+			b.Run(impl.name, func(b *testing.B) {
+				i := 0
+				for i < b.N {
+					b.StopTimer()
+					tr := impl.new()
+					for _, v := range perm(size) {
+						tr.Insert(v)
+					}
+					b.StartTimer()
+					for _, item := range lookupSeq {
+						tr.Get(item)
+						i++
+						if i >= b.N {
+							return
+						}
+					}
+				}
+			})
+		}
+	})
+
+	// InsertAfterClone clones a pre-populated tree then inserts new random items.
+	b.Run("InsertAfterClone", func(b *testing.B) {
+		base := perm(benchmarkTreeSize)
+		extra := perm(benchmarkTreeSize)
+		for _, impl := range impls {
+			b.Run(impl.name, func(b *testing.B) {
+				src := impl.new()
+				for _, item := range base {
+					src.Insert(item)
+				}
+				b.ResetTimer()
+				i := 0
+				for b.Loop() {
+					tr := src.Clone()
+					tr.Insert(extra[i%benchmarkTreeSize])
+					i++
+				}
+			})
+		}
+	})
+
+	// PivotAscend seeks to a random position and iterates 10 items ascending.
+	b.Run("PivotAscend", func(b *testing.B) {
+		const size = benchmarkTreeSizeLarge
+		for _, impl := range impls {
+			b.Run(impl.name, func(b *testing.B) {
+				tr := impl.new()
+				for _, item := range perm(size) {
+					tr.Insert(item)
+				}
+				b.ResetTimer()
+				i := 0
+				for b.Loop() {
+					n := 0
+					tr.AscendFrom(i%size, func(_ int) bool {
+						n++
+						return n < 10
+					})
+					i++
+				}
+			})
+		}
+	})
+
+	// PivotDescend seeks to a random position and iterates 10 items descending.
+	b.Run("PivotDescend", func(b *testing.B) {
+		const size = benchmarkTreeSizeLarge
+		for _, impl := range impls {
+			b.Run(impl.name, func(b *testing.B) {
+				tr := impl.new()
+				for _, item := range perm(size) {
+					tr.Insert(item)
+				}
+				b.ResetTimer()
+				i := 0
+				for b.Loop() {
+					n := 0
+					tr.DescendFrom(i%size, func(_ int) bool {
+						n++
+						return n < 10
+					})
+					i++
+				}
+			})
+		}
+	})
 }
