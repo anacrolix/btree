@@ -17,6 +17,25 @@ The `interval` package provides interval trees for efficiently finding all inter
 
 The `orderstat` package provides order-statistic trees that support O(log n) rank queries and nth element selection. The iterator adds `Rank()` and `SeekNth()` methods for efficient positional queries.
 
+## Benchmarks
+
+The `bench/` directory contains comparative benchmarks against [tidwall/btree](https://github.com/tidwall/btree) and [google/btree](https://github.com/google/btree). Four operations are benchmarked: insert, get, delete, and ascending iteration.
+
+```
+cd bench
+go test -bench=. -benchmem -count=6
+```
+
+To compare against another ref using [benchstat](https://pkg.go.dev/golang.org/x/perf/cmd/benchstat):
+
+```
+go test -bench=. -benchmem -count=6 ./bench/ > new.txt
+git stash
+go test -bench=. -benchmem -count=6 ./bench/ > old.txt
+git stash pop
+benchstat old.txt new.txt
+```
+
 ## License
 
 Copyright 2021 Andrew Werner. Licensed under the Apache License, Version 2.0.

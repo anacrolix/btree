@@ -22,7 +22,7 @@ import (
 
 var benchSizes = []int{100, 1_000, 10_000, 100_000}
 
-func BenchmarkGet(b *testing.B) {
+func BenchmarkGetBySize(b *testing.B) {
 	for _, n := range benchSizes {
 		m := MakeMap[int, int](cmp.Compare)
 		for i := range n {
