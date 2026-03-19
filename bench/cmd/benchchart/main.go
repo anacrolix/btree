@@ -343,6 +343,8 @@ var tmpl = template.Must(template.New("chart").Funcs(funcs).Parse(`<!DOCTYPE htm
   .section { background: white; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,.15);
              margin: 24px auto; max-width: 1100px; padding: 24px; }
   h2 { margin-top: 0; color: #444; border-bottom: 1px solid #eee; padding-bottom: 8px; }
+  h2 a { color: inherit; text-decoration: none; }
+  h2 a:hover { text-decoration: underline; }
   .suite-table { display: grid; grid-template-columns: 13rem 1fr 1fr 1fr; gap: 6px 12px;
                  align-items: center; }
   .col-header { font-size: 0.75rem; font-weight: 600; color: #888; text-align: center;
@@ -356,8 +358,8 @@ var tmpl = template.Must(template.New("chart").Funcs(funcs).Parse(`<!DOCTYPE htm
 <h1>B-tree Implementation Comparison</h1>
 <p style="text-align:center;color:#666;margin-top:-8px">Runtime is relative to ajwerner; memory in B/KiB/MiB and allocs are absolute. Lower is better in all cases.</p>
 {{range $gi, $g := .Groups}}
-<div class="section">
-  <h2>{{$g.Group}} test suite</h2>
+<div class="section" id="{{$g.Group}}">
+  <h2><a href="#{{$g.Group}}">{{$g.Group}} test suite</a></h2>
   <div class="suite-table">
     <div></div>
     <div class="col-header">Runtime</div>
