@@ -131,6 +131,7 @@ func (n *Node[K, V, A]) clone(
 	c.count = n.count
 	c.aug = n.aug
 	c.keys = n.keys
+	c.values = n.values
 	if !c.IsLeaf() {
 		// Copy children and increase each refcount.
 		*c.children = *n.children
@@ -290,12 +291,8 @@ func (n *Node[K, V, A]) split(cfg *config[K, V, A], i int) (K, V, *Node[K, V, A]
 	next.count = n.count - int16(i+1)
 	copy(next.keys[:], n.keys[i+1:n.count])
 	copy(next.values[:], n.values[i+1:n.count])
-	var rK K
-	var rV V
-	for j := int16(i); j < n.count; j++ {
-		n.keys[j] = rK
-		n.values[j] = rV
-	}
+	clear(n.keys[i:n.count])
+	clear(n.values[i:n.count])
 	if !n.IsLeaf() {
 		copy(next.children[:], n.children[i+1:n.count+1])
 		for j := int16(i + 1); j <= n.count; j++ {

@@ -62,14 +62,22 @@ func (np *nodePool[K, V, A]) getLeafNode() *Node[K, V, A] {
 }
 
 func (np *nodePool[K, V, A]) putInteriorNode(n *Node[K, V, A]) {
-	children := n.children
-	*children = [MaxEntries + 1]*Node[K, V, A]{}
-	*n = Node[K, V, A]{}
-	n.children = children
+	count := n.count
+	clear((*n.children)[:count+1])
+	clear(n.keys[:count])
+	clear(n.values[:count])
+	n.ref = 0
+	n.count = 0
+	n.aug = *new(A)
 	np.interiorNodePool.Put(n)
 }
 
 func (np *nodePool[K, V, A]) putLeafNode(n *Node[K, V, A]) {
-	*n = Node[K, V, A]{}
+	count := n.count
+	clear(n.keys[:count])
+	clear(n.values[:count])
+	n.ref = 0
+	n.count = 0
+	n.aug = *new(A)
 	np.leafNodePool.Put(n)
 }
