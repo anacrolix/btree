@@ -60,6 +60,54 @@ func (t *Set[K]) Delete(item K) (removed bool) {
 	return removed
 }
 
+// Ascend calls fn for each key-value pair in ascending order.
+// Iteration stops when fn returns false.
+func (m *Map[K, V]) Ascend(fn func(K, V) bool) { m.Map.Ascend(fn) }
+
+// AscendFrom calls fn for each key-value pair with key >= ge, in ascending order.
+// Iteration stops when fn returns false.
+func (m *Map[K, V]) AscendFrom(ge K, fn func(K, V) bool) { m.Map.AscendFrom(ge, fn) }
+
+// AscendRange calls fn for each key-value pair with ge <= key < lt, in ascending order.
+// Iteration stops when fn returns false.
+func (m *Map[K, V]) AscendRange(ge, lt K, fn func(K, V) bool) { m.Map.AscendRange(ge, lt, fn) }
+
+// Descend calls fn for each key-value pair in descending order.
+// Iteration stops when fn returns false.
+func (m *Map[K, V]) Descend(fn func(K, V) bool) { m.Map.Descend(fn) }
+
+// DescendFrom calls fn for each key-value pair with key <= le, in descending order.
+// Iteration stops when fn returns false.
+func (m *Map[K, V]) DescendFrom(le K, fn func(K, V) bool) { m.Map.DescendFrom(le, fn) }
+
+// DescendRange calls fn for each key-value pair with gt < key <= le, in descending order.
+// Iteration stops when fn returns false.
+func (m *Map[K, V]) DescendRange(le, gt K, fn func(K, V) bool) { m.Map.DescendRange(le, gt, fn) }
+
+// Min returns the minimum key-value pair in the map, if any.
+func (m *Map[K, V]) Min() (K, V, bool) { return m.Map.Min() }
+
+// Max returns the maximum key-value pair in the map, if any.
+func (m *Map[K, V]) Max() (K, V, bool) { return m.Map.Max() }
+
+// Ascend calls fn for each item in ascending order.
+// Iteration stops when fn returns false.
+func (t *Set[T]) Ascend(fn func(T) bool) {
+	(*Map[T, struct{}])(t).Ascend(func(k T, _ struct{}) bool { return fn(k) })
+}
+
+// Min returns the minimum item in the set, if any.
+func (t *Set[T]) Min() (T, bool) {
+	k, _, ok := (*Map[T, struct{}])(t).Min()
+	return k, ok
+}
+
+// Max returns the maximum item in the set, if any.
+func (t *Set[T]) Max() (T, bool) {
+	k, _, ok := (*Map[T, struct{}])(t).Max()
+	return k, ok
+}
+
 // MapIterator is an iterator for a Map.
 type MapIterator[K, V any] = abstract.Iterator[K, V, struct{}]
 

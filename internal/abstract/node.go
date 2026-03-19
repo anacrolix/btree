@@ -564,6 +564,242 @@ func (n *Node[K, V, A]) remove(
 	return outK, outV, found, newBound
 }
 
+// ascendAll calls fn for all key-value pairs in ascending order.
+func (n *Node[K, V, A]) ascendAll(fn func(K, V) bool) bool {
+	if n.IsLeaf() {
+		for i := int16(0); i < n.count; i++ {
+			if !fn(n.keys[i], n.values[i]) {
+				return false
+			}
+		}
+		return true
+	}
+	for i := int16(0); i < n.count; i++ {
+		if !n.children[i].ascendAll(fn) {
+			return false
+		}
+		if !fn(n.keys[i], n.values[i]) {
+			return false
+		}
+	}
+	return n.children[n.count].ascendAll(fn)
+}
+
+// ascendFrom calls fn for all key-value pairs with key >= ge in ascending order.
+func (n *Node[K, V, A]) ascendFrom(cmp func(K, K) int, ge K, fn func(K, V) bool) bool {
+	idx, found := n.find(cmp, ge)
+	if n.IsLeaf() {
+		for i := int16(idx); i < n.count; i++ {
+			if !fn(n.keys[i], n.values[i]) {
+				return false
+			}
+		}
+		return true
+	}
+	if !found {
+		if !n.children[idx].ascendFrom(cmp, ge, fn) {
+			return false
+		}
+	}
+	for i := int16(idx); i < n.count; i++ {
+		if !fn(n.keys[i], n.values[i]) {
+			return false
+		}
+		if !n.children[i+1].ascendAll(fn) {
+			return false
+		}
+	}
+	return true
+}
+
+// ascendRange calls fn for all key-value pairs with ge <= key < lt in ascending order.
+func (n *Node[K, V, A]) ascendRange(cmp func(K, K) int, ge, lt K, fn func(K, V) bool) bool {
+	idx, found := n.find(cmp, ge)
+	if n.IsLeaf() {
+		for i := int16(idx); i < n.count; i++ {
+			if cmp(n.keys[i], lt) >= 0 {
+				return true
+			}
+			if !fn(n.keys[i], n.values[i]) {
+				return false
+			}
+		}
+		return true
+	}
+	if !found {
+		if !n.children[idx].ascendRange(cmp, ge, lt, fn) {
+			return false
+		}
+	}
+	for i := int16(idx); i < n.count; i++ {
+		if cmp(n.keys[i], lt) >= 0 {
+			return true
+		}
+		if !fn(n.keys[i], n.values[i]) {
+			return false
+		}
+		if !n.children[i+1].ascendRange(cmp, ge, lt, fn) {
+			return false
+		}
+	}
+	return true
+}
+
+// descendAll calls fn for all key-value pairs in descending order.
+func (n *Node[K, V, A]) descendAll(fn func(K, V) bool) bool {
+	if n.IsLeaf() {
+		for i := n.count - 1; i >= 0; i-- {
+			if !fn(n.keys[i], n.values[i]) {
+				return false
+			}
+		}
+		return true
+	}
+	if !n.children[n.count].descendAll(fn) {
+		return false
+	}
+	for i := n.count - 1; i >= 0; i-- {
+		if !fn(n.keys[i], n.values[i]) {
+			return false
+		}
+		if !n.children[i].descendAll(fn) {
+			return false
+		}
+	}
+	return true
+}
+
+// descendFrom calls fn for all key-value pairs with key <= le in descending order.
+func (n *Node[K, V, A]) descendFrom(cmp func(K, K) int, le K, fn func(K, V) bool) bool {
+	idx, found := n.find(cmp, le)
+	if n.IsLeaf() {
+		start := int16(idx - 1)
+		if found {
+			start = int16(idx)
+		}
+		for i := start; i >= 0; i-- {
+			if !fn(n.keys[i], n.values[i]) {
+				return false
+			}
+		}
+		return true
+	}
+	if found {
+		if !fn(n.keys[idx], n.values[idx]) {
+			return false
+		}
+		if !n.children[idx].descendAll(fn) {
+			return false
+		}
+		for i := int16(idx - 1); i >= 0; i-- {
+			if !fn(n.keys[i], n.values[i]) {
+				return false
+			}
+			if !n.children[i].descendAll(fn) {
+				return false
+			}
+		}
+	} else {
+		if !n.children[idx].descendFrom(cmp, le, fn) {
+			return false
+		}
+		for i := int16(idx - 1); i >= 0; i-- {
+			if !fn(n.keys[i], n.values[i]) {
+				return false
+			}
+			if !n.children[i].descendAll(fn) {
+				return false
+			}
+		}
+	}
+	return true
+}
+
+// descendLowerBound calls fn for all key-value pairs with key > gt in descending order.
+func (n *Node[K, V, A]) descendLowerBound(cmp func(K, K) int, gt K, fn func(K, V) bool) bool {
+	if n.IsLeaf() {
+		for i := n.count - 1; i >= 0; i-- {
+			if cmp(n.keys[i], gt) <= 0 {
+				return true
+			}
+			if !fn(n.keys[i], n.values[i]) {
+				return false
+			}
+		}
+		return true
+	}
+	if !n.children[n.count].descendLowerBound(cmp, gt, fn) {
+		return false
+	}
+	for i := n.count - 1; i >= 0; i-- {
+		if cmp(n.keys[i], gt) <= 0 {
+			return true
+		}
+		if !fn(n.keys[i], n.values[i]) {
+			return false
+		}
+		if !n.children[i].descendLowerBound(cmp, gt, fn) {
+			return false
+		}
+	}
+	return true
+}
+
+// descendRange calls fn for all key-value pairs with gt < key <= le in descending order.
+func (n *Node[K, V, A]) descendRange(cmp func(K, K) int, le, gt K, fn func(K, V) bool) bool {
+	idx, found := n.find(cmp, le)
+	if n.IsLeaf() {
+		start := int16(idx - 1)
+		if found {
+			start = int16(idx)
+		}
+		for i := start; i >= 0; i-- {
+			if cmp(n.keys[i], gt) <= 0 {
+				return true
+			}
+			if !fn(n.keys[i], n.values[i]) {
+				return false
+			}
+		}
+		return true
+	}
+	if found {
+		if !fn(n.keys[idx], n.values[idx]) {
+			return false
+		}
+		if !n.children[idx].descendLowerBound(cmp, gt, fn) {
+			return false
+		}
+		for i := int16(idx - 1); i >= 0; i-- {
+			if cmp(n.keys[i], gt) <= 0 {
+				return true
+			}
+			if !fn(n.keys[i], n.values[i]) {
+				return false
+			}
+			if !n.children[i].descendLowerBound(cmp, gt, fn) {
+				return false
+			}
+		}
+	} else {
+		if !n.children[idx].descendRange(cmp, le, gt, fn) {
+			return false
+		}
+		for i := int16(idx - 1); i >= 0; i-- {
+			if cmp(n.keys[i], gt) <= 0 {
+				return true
+			}
+			if !fn(n.keys[i], n.values[i]) {
+				return false
+			}
+			if !n.children[i].descendLowerBound(cmp, gt, fn) {
+				return false
+			}
+		}
+	}
+	return true
+}
+
 func (n *Node[K, V, A]) writeString(b *strings.Builder) {
 	if n.IsLeaf() {
 		for i := int16(0); i < n.count; i++ {

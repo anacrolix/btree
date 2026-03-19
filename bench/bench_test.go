@@ -122,111 +122,55 @@ func (a *ajwernerAdapter) Seek(k int) bool {
 }
 
 func (a *ajwernerAdapter) Ascend(fn func(k int) bool) {
-	it := a.m.Iterator()
-	for it.First(); it.Valid(); it.Next() {
-		if !fn(it.Cur()) {
-			return
-		}
-	}
+	a.m.Ascend(func(k int, _ struct{}) bool { return fn(k) })
 }
 
 func (a *ajwernerAdapter) Descend(fn func(k int) bool) {
-	it := a.m.Iterator()
-	for it.Last(); it.Valid(); it.Prev() {
-		if !fn(it.Cur()) {
-			return
-		}
-	}
+	a.m.Descend(func(k int, _ struct{}) bool { return fn(k) })
 }
 
 func (a *ajwernerAdapter) AscendFrom(ge int, fn func(k int) bool) {
-	it := a.m.Iterator()
-	for it.SeekGE(ge); it.Valid(); it.Next() {
-		if !fn(it.Cur()) {
-			return
-		}
-	}
+	a.m.AscendFrom(ge, func(k int, _ struct{}) bool { return fn(k) })
 }
 
 func (a *ajwernerAdapter) DescendFrom(le int, fn func(k int) bool) {
-	it := a.m.Iterator()
-	it.SeekGE(le)
-	if !it.Valid() {
-		it.Last()
-	} else if it.Cur() > le {
-		it.Prev()
-	}
-	for it.Valid() {
-		if !fn(it.Cur()) {
-			return
-		}
-		it.Prev()
-	}
+	a.m.DescendFrom(le, func(k int, _ struct{}) bool { return fn(k) })
 }
 
 func (a *ajwernerAdapter) AscendRange(ge, lt int, fn func(k int) bool) {
-	it := a.m.Iterator()
-	for it.SeekGE(ge); it.Valid() && it.Cur() < lt; it.Next() {
-		if !fn(it.Cur()) {
-			return
-		}
-	}
+	a.m.AscendRange(ge, lt, func(k int, _ struct{}) bool { return fn(k) })
 }
 
 func (a *ajwernerAdapter) DescendRange(le, gt int, fn func(k int) bool) {
-	it := a.m.Iterator()
-	it.SeekGE(le)
-	if !it.Valid() {
-		it.Last()
-	} else if it.Cur() > le {
-		it.Prev()
-	}
-	for it.Valid() && it.Cur() > gt {
-		if !fn(it.Cur()) {
-			return
-		}
-		it.Prev()
-	}
+	a.m.DescendRange(le, gt, func(k int, _ struct{}) bool { return fn(k) })
 }
 
 func (a *ajwernerAdapter) Min() (int, bool) {
-	it := a.m.Iterator()
-	it.First()
-	if !it.Valid() {
-		return 0, false
-	}
-	return it.Cur(), true
+	k, _, ok := a.m.Min()
+	return k, ok
 }
 
 func (a *ajwernerAdapter) Max() (int, bool) {
-	it := a.m.Iterator()
-	it.Last()
-	if !it.Valid() {
-		return 0, false
-	}
-	return it.Cur(), true
+	k, _, ok := a.m.Max()
+	return k, ok
 }
 
 func (a *ajwernerAdapter) DeleteMin() (int, bool) {
-	it := a.m.Iterator()
-	it.First()
-	if !it.Valid() {
+	k, _, ok := a.m.Min()
+	if !ok {
 		return 0, false
 	}
-	v := it.Cur()
-	a.m.Delete(v)
-	return v, true
+	a.m.Delete(k)
+	return k, true
 }
 
 func (a *ajwernerAdapter) DeleteMax() (int, bool) {
-	it := a.m.Iterator()
-	it.Last()
-	if !it.Valid() {
+	k, _, ok := a.m.Max()
+	if !ok {
 		return 0, false
 	}
-	v := it.Cur()
-	a.m.Delete(v)
-	return v, true
+	a.m.Delete(k)
+	return k, true
 }
 
 // ===== tidwall/btree adapter =====
@@ -358,7 +302,7 @@ type googleAdapter struct {
 
 func newGoogle() BTree {
 	less := func(a, b int) bool { return a < b }
-	return &googleAdapter{t: googlebtree.NewG[int](32, less), less: less}
+	return &googleAdapter{t: googlebtree.NewG(32, less), less: less}
 }
 
 func (a *googleAdapter) Insert(k int) { a.t.ReplaceOrInsert(k) }
@@ -370,7 +314,7 @@ func (a *googleAdapter) Delete(k int) bool {
 
 func (a *googleAdapter) Get(k int) bool { _, ok := a.t.Get(k); return ok }
 func (a *googleAdapter) Len() int        { return a.t.Len() }
-func (a *googleAdapter) Reset()          { a.t = googlebtree.NewG[int](32, a.less) }
+func (a *googleAdapter) Reset()          { a.t = googlebtree.NewG(32, a.less) }
 
 func (a *googleAdapter) Seek(k int) bool {
 	var found bool
@@ -420,7 +364,7 @@ func (a *googleAdapter) NewCursor() Cursor {
 }
 
 func (a *googleAdapter) Clone() BTree {
-	clone := &googleAdapter{t: googlebtree.NewG[int](32, a.less), less: a.less}
+	clone := &googleAdapter{t: googlebtree.NewG(32, a.less), less: a.less}
 	a.t.Ascend(func(k int) bool { clone.t.ReplaceOrInsert(k); return true })
 	return clone
 }

@@ -176,6 +176,78 @@ func (t *Map[K, V, A]) Get(k K) (v V, ok bool) {
 	return v, false
 }
 
+// Ascend calls fn for each key-value pair in ascending order.
+// Iteration stops when fn returns false.
+func (t *Map[K, V, A]) Ascend(fn func(K, V) bool) {
+	if t.root != nil {
+		t.root.ascendAll(fn)
+	}
+}
+
+// AscendFrom calls fn for each key-value pair with key >= ge, in ascending order.
+// Iteration stops when fn returns false.
+func (t *Map[K, V, A]) AscendFrom(ge K, fn func(K, V) bool) {
+	if t.root != nil {
+		t.root.ascendFrom(t.cfg.cmp, ge, fn)
+	}
+}
+
+// AscendRange calls fn for each key-value pair with ge <= key < lt, in ascending order.
+// Iteration stops when fn returns false.
+func (t *Map[K, V, A]) AscendRange(ge, lt K, fn func(K, V) bool) {
+	if t.root != nil {
+		t.root.ascendRange(t.cfg.cmp, ge, lt, fn)
+	}
+}
+
+// Descend calls fn for each key-value pair in descending order.
+// Iteration stops when fn returns false.
+func (t *Map[K, V, A]) Descend(fn func(K, V) bool) {
+	if t.root != nil {
+		t.root.descendAll(fn)
+	}
+}
+
+// DescendFrom calls fn for each key-value pair with key <= le, in descending order.
+// Iteration stops when fn returns false.
+func (t *Map[K, V, A]) DescendFrom(le K, fn func(K, V) bool) {
+	if t.root != nil {
+		t.root.descendFrom(t.cfg.cmp, le, fn)
+	}
+}
+
+// DescendRange calls fn for each key-value pair with gt < key <= le, in descending order.
+// Iteration stops when fn returns false.
+func (t *Map[K, V, A]) DescendRange(le, gt K, fn func(K, V) bool) {
+	if t.root != nil {
+		t.root.descendRange(t.cfg.cmp, le, gt, fn)
+	}
+}
+
+// Min returns the minimum key-value pair in the tree, if any.
+func (t *Map[K, V, A]) Min() (k K, v V, ok bool) {
+	n := t.root
+	if n == nil {
+		return k, v, false
+	}
+	for !n.IsLeaf() {
+		n = n.children[0]
+	}
+	return n.keys[0], n.values[0], true
+}
+
+// Max returns the maximum key-value pair in the tree, if any.
+func (t *Map[K, V, A]) Max() (k K, v V, ok bool) {
+	n := t.root
+	if n == nil {
+		return k, v, false
+	}
+	for !n.IsLeaf() {
+		n = n.children[n.count]
+	}
+	return n.keys[n.count-1], n.values[n.count-1], true
+}
+
 // String returns a string description of the tree. The format is
 // similar to the https://en.wikipedia.org/wiki/Newick_format.
 func (t *Map[K, V, A]) String() string {
