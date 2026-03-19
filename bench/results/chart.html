@@ -99,6 +99,137 @@
 </div>
 
 <div class="section">
+  <h2>Erigon test suite</h2>
+  <div class="suite-table">
+    <div></div>
+    <div class="col-header">Runtime</div>
+    <div class="col-header">B/op</div>
+    <div class="col-header">allocs/op</div>
+  
+    <div class="row-label">CloneBySize/n=100</div>
+    <div class="chart-cell"><canvas id="c1_0"></canvas></div>
+    <div class="chart-cell"><canvas id="m1_0"></canvas></div>
+    <div class="chart-cell"><canvas id="a1_0"></canvas></div>
+  
+    <div class="row-label">CloneBySize/n=1000</div>
+    <div class="chart-cell"><canvas id="c1_1"></canvas></div>
+    <div class="chart-cell"><canvas id="m1_1"></canvas></div>
+    <div class="chart-cell"><canvas id="a1_1"></canvas></div>
+  
+    <div class="row-label">CloneBySize/n=10000</div>
+    <div class="chart-cell"><canvas id="c1_2"></canvas></div>
+    <div class="chart-cell"><canvas id="m1_2"></canvas></div>
+    <div class="chart-cell"><canvas id="a1_2"></canvas></div>
+  
+    <div class="row-label">CloneBySize/n=100000</div>
+    <div class="chart-cell"><canvas id="c1_3"></canvas></div>
+    <div class="chart-cell"><canvas id="m1_3"></canvas></div>
+    <div class="chart-cell"><canvas id="a1_3"></canvas></div>
+  
+    <div class="row-label">DeleteBySize/n=100</div>
+    <div class="chart-cell"><canvas id="c1_4"></canvas></div>
+    <div class="chart-cell"><canvas id="m1_4"></canvas></div>
+    <div class="chart-cell"><canvas id="a1_4"></canvas></div>
+  
+    <div class="row-label">DeleteBySize/n=1000</div>
+    <div class="chart-cell"><canvas id="c1_5"></canvas></div>
+    <div class="chart-cell"><canvas id="m1_5"></canvas></div>
+    <div class="chart-cell"><canvas id="a1_5"></canvas></div>
+  
+    <div class="row-label">DeleteBySize/n=10000</div>
+    <div class="chart-cell"><canvas id="c1_6"></canvas></div>
+    <div class="chart-cell"><canvas id="m1_6"></canvas></div>
+    <div class="chart-cell"><canvas id="a1_6"></canvas></div>
+  
+    <div class="row-label">DeleteBySize/n=100000</div>
+    <div class="chart-cell"><canvas id="c1_7"></canvas></div>
+    <div class="chart-cell"><canvas id="m1_7"></canvas></div>
+    <div class="chart-cell"><canvas id="a1_7"></canvas></div>
+  
+    <div class="row-label">IterateAscBySize/n=100</div>
+    <div class="chart-cell"><canvas id="c1_8"></canvas></div>
+    <div class="chart-cell"><canvas id="m1_8"></canvas></div>
+    <div class="chart-cell"><canvas id="a1_8"></canvas></div>
+  
+    <div class="row-label">IterateAscBySize/n=1000</div>
+    <div class="chart-cell"><canvas id="c1_9"></canvas></div>
+    <div class="chart-cell"><canvas id="m1_9"></canvas></div>
+    <div class="chart-cell"><canvas id="a1_9"></canvas></div>
+  
+    <div class="row-label">IterateAscBySize/n=10000</div>
+    <div class="chart-cell"><canvas id="c1_10"></canvas></div>
+    <div class="chart-cell"><canvas id="m1_10"></canvas></div>
+    <div class="chart-cell"><canvas id="a1_10"></canvas></div>
+  
+    <div class="row-label">IterateAscBySize/n=100000</div>
+    <div class="chart-cell"><canvas id="c1_11"></canvas></div>
+    <div class="chart-cell"><canvas id="m1_11"></canvas></div>
+    <div class="chart-cell"><canvas id="a1_11"></canvas></div>
+  
+    <div class="row-label">IterateDescBySize/n=100</div>
+    <div class="chart-cell"><canvas id="c1_12"></canvas></div>
+    <div class="chart-cell"><canvas id="m1_12"></canvas></div>
+    <div class="chart-cell"><canvas id="a1_12"></canvas></div>
+  
+    <div class="row-label">IterateDescBySize/n=1000</div>
+    <div class="chart-cell"><canvas id="c1_13"></canvas></div>
+    <div class="chart-cell"><canvas id="m1_13"></canvas></div>
+    <div class="chart-cell"><canvas id="a1_13"></canvas></div>
+  
+    <div class="row-label">IterateDescBySize/n=10000</div>
+    <div class="chart-cell"><canvas id="c1_14"></canvas></div>
+    <div class="chart-cell"><canvas id="m1_14"></canvas></div>
+    <div class="chart-cell"><canvas id="a1_14"></canvas></div>
+  
+    <div class="row-label">IterateDescBySize/n=100000</div>
+    <div class="chart-cell"><canvas id="c1_15"></canvas></div>
+    <div class="chart-cell"><canvas id="m1_15"></canvas></div>
+    <div class="chart-cell"><canvas id="a1_15"></canvas></div>
+  
+    <div class="row-label">SeekGEBySize/n=100</div>
+    <div class="chart-cell"><canvas id="c1_16"></canvas></div>
+    <div class="chart-cell"><canvas id="m1_16"></canvas></div>
+    <div class="chart-cell"><canvas id="a1_16"></canvas></div>
+  
+    <div class="row-label">SeekGEBySize/n=1000</div>
+    <div class="chart-cell"><canvas id="c1_17"></canvas></div>
+    <div class="chart-cell"><canvas id="m1_17"></canvas></div>
+    <div class="chart-cell"><canvas id="a1_17"></canvas></div>
+  
+    <div class="row-label">SeekGEBySize/n=10000</div>
+    <div class="chart-cell"><canvas id="c1_18"></canvas></div>
+    <div class="chart-cell"><canvas id="m1_18"></canvas></div>
+    <div class="chart-cell"><canvas id="a1_18"></canvas></div>
+  
+    <div class="row-label">SeekGEBySize/n=100000</div>
+    <div class="chart-cell"><canvas id="c1_19"></canvas></div>
+    <div class="chart-cell"><canvas id="m1_19"></canvas></div>
+    <div class="chart-cell"><canvas id="a1_19"></canvas></div>
+  
+    <div class="row-label">UpsertBySize/n=100</div>
+    <div class="chart-cell"><canvas id="c1_20"></canvas></div>
+    <div class="chart-cell"><canvas id="m1_20"></canvas></div>
+    <div class="chart-cell"><canvas id="a1_20"></canvas></div>
+  
+    <div class="row-label">UpsertBySize/n=1000</div>
+    <div class="chart-cell"><canvas id="c1_21"></canvas></div>
+    <div class="chart-cell"><canvas id="m1_21"></canvas></div>
+    <div class="chart-cell"><canvas id="a1_21"></canvas></div>
+  
+    <div class="row-label">UpsertBySize/n=10000</div>
+    <div class="chart-cell"><canvas id="c1_22"></canvas></div>
+    <div class="chart-cell"><canvas id="m1_22"></canvas></div>
+    <div class="chart-cell"><canvas id="a1_22"></canvas></div>
+  
+    <div class="row-label">UpsertBySize/n=100000</div>
+    <div class="chart-cell"><canvas id="c1_23"></canvas></div>
+    <div class="chart-cell"><canvas id="m1_23"></canvas></div>
+    <div class="chart-cell"><canvas id="a1_23"></canvas></div>
+  
+  </div>
+</div>
+
+<div class="section">
   <h2>Tidwall test suite</h2>
   <div class="suite-table">
     <div></div>
@@ -107,29 +238,29 @@
     <div class="col-header">allocs/op</div>
   
     <div class="row-label">GetSeq</div>
-    <div class="chart-cell"><canvas id="c1_0"></canvas></div>
-    <div class="chart-cell"><canvas id="m1_0"></canvas></div>
-    <div class="chart-cell"><canvas id="a1_0"></canvas></div>
+    <div class="chart-cell"><canvas id="c2_0"></canvas></div>
+    <div class="chart-cell"><canvas id="m2_0"></canvas></div>
+    <div class="chart-cell"><canvas id="a2_0"></canvas></div>
   
     <div class="row-label">InsertAfterClone</div>
-    <div class="chart-cell"><canvas id="c1_1"></canvas></div>
-    <div class="chart-cell"><canvas id="m1_1"></canvas></div>
-    <div class="chart-cell"><canvas id="a1_1"></canvas></div>
+    <div class="chart-cell"><canvas id="c2_1"></canvas></div>
+    <div class="chart-cell"><canvas id="m2_1"></canvas></div>
+    <div class="chart-cell"><canvas id="a2_1"></canvas></div>
   
     <div class="row-label">InsertSeq</div>
-    <div class="chart-cell"><canvas id="c1_2"></canvas></div>
-    <div class="chart-cell"><canvas id="m1_2"></canvas></div>
-    <div class="chart-cell"><canvas id="a1_2"></canvas></div>
+    <div class="chart-cell"><canvas id="c2_2"></canvas></div>
+    <div class="chart-cell"><canvas id="m2_2"></canvas></div>
+    <div class="chart-cell"><canvas id="a2_2"></canvas></div>
   
     <div class="row-label">PivotAscend</div>
-    <div class="chart-cell"><canvas id="c1_3"></canvas></div>
-    <div class="chart-cell"><canvas id="m1_3"></canvas></div>
-    <div class="chart-cell"><canvas id="a1_3"></canvas></div>
+    <div class="chart-cell"><canvas id="c2_3"></canvas></div>
+    <div class="chart-cell"><canvas id="m2_3"></canvas></div>
+    <div class="chart-cell"><canvas id="a2_3"></canvas></div>
   
     <div class="row-label">PivotDescend</div>
-    <div class="chart-cell"><canvas id="c1_4"></canvas></div>
-    <div class="chart-cell"><canvas id="m1_4"></canvas></div>
-    <div class="chart-cell"><canvas id="a1_4"></canvas></div>
+    <div class="chart-cell"><canvas id="c2_4"></canvas></div>
+    <div class="chart-cell"><canvas id="m2_4"></canvas></div>
+    <div class="chart-cell"><canvas id="a2_4"></canvas></div>
   
   </div>
 </div>
@@ -143,24 +274,24 @@
     <div class="col-header">allocs/op</div>
   
     <div class="row-label">CursorAscend</div>
-    <div class="chart-cell"><canvas id="c2_0"></canvas></div>
-    <div class="chart-cell"><canvas id="m2_0"></canvas></div>
-    <div class="chart-cell"><canvas id="a2_0"></canvas></div>
+    <div class="chart-cell"><canvas id="c3_0"></canvas></div>
+    <div class="chart-cell"><canvas id="m3_0"></canvas></div>
+    <div class="chart-cell"><canvas id="a3_0"></canvas></div>
   
     <div class="row-label">CursorNext</div>
-    <div class="chart-cell"><canvas id="c2_1"></canvas></div>
-    <div class="chart-cell"><canvas id="m2_1"></canvas></div>
-    <div class="chart-cell"><canvas id="a2_1"></canvas></div>
+    <div class="chart-cell"><canvas id="c3_1"></canvas></div>
+    <div class="chart-cell"><canvas id="m3_1"></canvas></div>
+    <div class="chart-cell"><canvas id="a3_1"></canvas></div>
   
     <div class="row-label">CursorSeek</div>
-    <div class="chart-cell"><canvas id="c2_2"></canvas></div>
-    <div class="chart-cell"><canvas id="m2_2"></canvas></div>
-    <div class="chart-cell"><canvas id="a2_2"></canvas></div>
+    <div class="chart-cell"><canvas id="c3_2"></canvas></div>
+    <div class="chart-cell"><canvas id="m3_2"></canvas></div>
+    <div class="chart-cell"><canvas id="a3_2"></canvas></div>
   
     <div class="row-label">Upsert</div>
-    <div class="chart-cell"><canvas id="c2_3"></canvas></div>
-    <div class="chart-cell"><canvas id="m2_3"></canvas></div>
-    <div class="chart-cell"><canvas id="a2_3"></canvas></div>
+    <div class="chart-cell"><canvas id="c3_3"></canvas></div>
+    <div class="chart-cell"><canvas id="m3_3"></canvas></div>
+    <div class="chart-cell"><canvas id="a3_3"></canvas></div>
   
   </div>
 </div>
@@ -207,7 +338,7 @@
   
   new Chart(document.getElementById("c0_0"), {
     type: "bar",
-    data: { labels: impls, datasets: [{ data: [1.00,0.82,1.07], backgroundColor: impls.map(bg) }] },
+    data: { labels: impls, datasets: [{ data: [1.00,0.92,1.20], backgroundColor: impls.map(bg) }] },
     options: chartOpts(v => (v*100).toFixed(0)+"%", ctx => (ctx.parsed.y*100).toFixed(1)+"%"),
   });
   new Chart(document.getElementById("m0_0"), {
@@ -223,7 +354,7 @@
   
   new Chart(document.getElementById("c0_1"), {
     type: "bar",
-    data: { labels: impls, datasets: [{ data: [1.00,0.89,1.18], backgroundColor: impls.map(bg) }] },
+    data: { labels: impls, datasets: [{ data: [1.00,0.95,1.30], backgroundColor: impls.map(bg) }] },
     options: chartOpts(v => (v*100).toFixed(0)+"%", ctx => (ctx.parsed.y*100).toFixed(1)+"%"),
   });
   new Chart(document.getElementById("m0_1"), {
@@ -239,7 +370,7 @@
   
   new Chart(document.getElementById("c0_2"), {
     type: "bar",
-    data: { labels: impls, datasets: [{ data: [1.00,0.84,1.63], backgroundColor: impls.map(bg) }] },
+    data: { labels: impls, datasets: [{ data: [1.00,0.86,1.68], backgroundColor: impls.map(bg) }] },
     options: chartOpts(v => (v*100).toFixed(0)+"%", ctx => (ctx.parsed.y*100).toFixed(1)+"%"),
   });
   new Chart(document.getElementById("m0_2"), {
@@ -255,7 +386,7 @@
   
   new Chart(document.getElementById("c0_3"), {
     type: "bar",
-    data: { labels: impls, datasets: [{ data: [1.00,0.77,1.06], backgroundColor: impls.map(bg) }] },
+    data: { labels: impls, datasets: [{ data: [1.00,0.76,1.06], backgroundColor: impls.map(bg) }] },
     options: chartOpts(v => (v*100).toFixed(0)+"%", ctx => (ctx.parsed.y*100).toFixed(1)+"%"),
   });
   new Chart(document.getElementById("m0_3"), {
@@ -271,7 +402,7 @@
   
   new Chart(document.getElementById("c0_4"), {
     type: "bar",
-    data: { labels: impls, datasets: [{ data: [1.00,0.76,0.99], backgroundColor: impls.map(bg) }] },
+    data: { labels: impls, datasets: [{ data: [1.00,0.83,1.06], backgroundColor: impls.map(bg) }] },
     options: chartOpts(v => (v*100).toFixed(0)+"%", ctx => (ctx.parsed.y*100).toFixed(1)+"%"),
   });
   new Chart(document.getElementById("m0_4"), {
@@ -287,12 +418,12 @@
   
   new Chart(document.getElementById("c0_5"), {
     type: "bar",
-    data: { labels: impls, datasets: [{ data: [1.00,231.86,480.42], backgroundColor: impls.map(bg) }] },
+    data: { labels: impls, datasets: [{ data: [1.00,205.10,421.06], backgroundColor: impls.map(bg) }] },
     options: chartOpts(v => (v*100).toFixed(0)+"%", ctx => (ctx.parsed.y*100).toFixed(1)+"%"),
   });
   new Chart(document.getElementById("m0_5"), {
     type: "bar",
-    data: { labels: impls, datasets: [{ data: [3540.00,188852.00,275498.00], backgroundColor: impls.map(bg) }] },
+    data: { labels: impls, datasets: [{ data: [3537.00,188854.50,275497.00], backgroundColor: impls.map(bg) }] },
     options: chartOpts(fmtBytes, ctx => ctx.label+": "+fmtBytes(ctx.parsed.y)),
   });
   new Chart(document.getElementById("a0_5"), {
@@ -303,7 +434,7 @@
   
   new Chart(document.getElementById("c0_6"), {
     type: "bar",
-    data: { labels: impls, datasets: [{ data: [1.00,0.83,1.16], backgroundColor: impls.map(bg) }] },
+    data: { labels: impls, datasets: [{ data: [1.00,0.73,0.93], backgroundColor: impls.map(bg) }] },
     options: chartOpts(v => (v*100).toFixed(0)+"%", ctx => (ctx.parsed.y*100).toFixed(1)+"%"),
   });
   new Chart(document.getElementById("m0_6"), {
@@ -319,7 +450,7 @@
   
   new Chart(document.getElementById("c0_7"), {
     type: "bar",
-    data: { labels: impls, datasets: [{ data: [1.00,0.87,1.19], backgroundColor: impls.map(bg) }] },
+    data: { labels: impls, datasets: [{ data: [1.00,0.85,1.21], backgroundColor: impls.map(bg) }] },
     options: chartOpts(v => (v*100).toFixed(0)+"%", ctx => (ctx.parsed.y*100).toFixed(1)+"%"),
   });
   new Chart(document.getElementById("m0_7"), {
@@ -335,7 +466,7 @@
   
   new Chart(document.getElementById("c0_8"), {
     type: "bar",
-    data: { labels: impls, datasets: [{ data: [1.00,0.88,1.76], backgroundColor: impls.map(bg) }] },
+    data: { labels: impls, datasets: [{ data: [1.00,0.90,1.80], backgroundColor: impls.map(bg) }] },
     options: chartOpts(v => (v*100).toFixed(0)+"%", ctx => (ctx.parsed.y*100).toFixed(1)+"%"),
   });
   new Chart(document.getElementById("m0_8"), {
@@ -351,7 +482,7 @@
   
   new Chart(document.getElementById("c0_9"), {
     type: "bar",
-    data: { labels: impls, datasets: [{ data: [1.00,0.86,2.29], backgroundColor: impls.map(bg) }] },
+    data: { labels: impls, datasets: [{ data: [1.00,0.97,2.35], backgroundColor: impls.map(bg) }] },
     options: chartOpts(v => (v*100).toFixed(0)+"%", ctx => (ctx.parsed.y*100).toFixed(1)+"%"),
   });
   new Chart(document.getElementById("m0_9"), {
@@ -367,7 +498,7 @@
   
   new Chart(document.getElementById("c0_10"), {
     type: "bar",
-    data: { labels: impls, datasets: [{ data: [1.00,0.89,1.18], backgroundColor: impls.map(bg) }] },
+    data: { labels: impls, datasets: [{ data: [1.00,0.86,1.11], backgroundColor: impls.map(bg) }] },
     options: chartOpts(v => (v*100).toFixed(0)+"%", ctx => (ctx.parsed.y*100).toFixed(1)+"%"),
   });
   new Chart(document.getElementById("m0_10"), {
@@ -383,7 +514,7 @@
   
   new Chart(document.getElementById("c0_11"), {
     type: "bar",
-    data: { labels: impls, datasets: [{ data: [1.00,0.81,1.05], backgroundColor: impls.map(bg) }] },
+    data: { labels: impls, datasets: [{ data: [1.00,0.82,1.07], backgroundColor: impls.map(bg) }] },
     options: chartOpts(v => (v*100).toFixed(0)+"%", ctx => (ctx.parsed.y*100).toFixed(1)+"%"),
   });
   new Chart(document.getElementById("m0_11"), {
@@ -399,7 +530,7 @@
   
   new Chart(document.getElementById("c0_12"), {
     type: "bar",
-    data: { labels: impls, datasets: [{ data: [1.00,0.72,1.10], backgroundColor: impls.map(bg) }] },
+    data: { labels: impls, datasets: [{ data: [1.00,0.71,1.04], backgroundColor: impls.map(bg) }] },
     options: chartOpts(v => (v*100).toFixed(0)+"%", ctx => (ctx.parsed.y*100).toFixed(1)+"%"),
   });
   new Chart(document.getElementById("m0_12"), {
@@ -439,81 +570,385 @@
   
   new Chart(document.getElementById("c1_0"), {
     type: "bar",
-    data: { labels: impls, datasets: [{ data: [1.00,0.69,1.11], backgroundColor: impls.map(bg) }] },
+    data: { labels: impls, datasets: [{ data: [1.00,7.39,12.11], backgroundColor: impls.map(bg) }] },
     options: chartOpts(v => (v*100).toFixed(0)+"%", ctx => (ctx.parsed.y*100).toFixed(1)+"%"),
   });
   new Chart(document.getElementById("m1_0"), {
     type: "bar",
-    data: { labels: impls, datasets: [{ data: [0.00,0.00,0.00], backgroundColor: impls.map(bg) }] },
+    data: { labels: impls, datasets: [{ data: [1200.00,2904.00,3232.00], backgroundColor: impls.map(bg) }] },
     options: chartOpts(fmtBytes, ctx => ctx.label+": "+fmtBytes(ctx.parsed.y)),
   });
   new Chart(document.getElementById("a1_0"), {
     type: "bar",
-    data: { labels: impls, datasets: [{ data: [0.00,0.00,0.00], backgroundColor: impls.map(bg) }] },
+    data: { labels: impls, datasets: [{ data: [2.00,20.00,24.00], backgroundColor: impls.map(bg) }] },
     options: chartOpts(v => v.toFixed(0), ctx => ctx.label+": "+ctx.parsed.y.toFixed(0)+" allocs"),
   });
   
   new Chart(document.getElementById("c1_1"), {
     type: "bar",
-    data: { labels: impls, datasets: [{ data: [1.00,271.17,547.61], backgroundColor: impls.map(bg) }] },
+    data: { labels: impls, datasets: [{ data: [1.00,29.51,57.59], backgroundColor: impls.map(bg) }] },
     options: chartOpts(v => (v*100).toFixed(0)+"%", ctx => (ctx.parsed.y*100).toFixed(1)+"%"),
   });
   new Chart(document.getElementById("m1_1"), {
     type: "bar",
-    data: { labels: impls, datasets: [{ data: [3495.00,187609.00,275498.00], backgroundColor: impls.map(bg) }] },
+    data: { labels: impls, datasets: [{ data: [3509.00,19512.00,27456.00], backgroundColor: impls.map(bg) }] },
     options: chartOpts(fmtBytes, ctx => ctx.label+": "+fmtBytes(ctx.parsed.y)),
   });
   new Chart(document.getElementById("a1_1"), {
     type: "bar",
-    data: { labels: impls, datasets: [{ data: [2.00,690.00,1009.00], backgroundColor: impls.map(bg) }] },
+    data: { labels: impls, datasets: [{ data: [3.00,83.00,115.00], backgroundColor: impls.map(bg) }] },
     options: chartOpts(v => v.toFixed(0), ctx => ctx.label+": "+ctx.parsed.y.toFixed(0)+" allocs"),
   });
   
   new Chart(document.getElementById("c1_2"), {
     type: "bar",
-    data: { labels: impls, datasets: [{ data: [1.00,0.61,1.04], backgroundColor: impls.map(bg) }] },
+    data: { labels: impls, datasets: [{ data: [1.00,204.49,395.45], backgroundColor: impls.map(bg) }] },
     options: chartOpts(v => (v*100).toFixed(0)+"%", ctx => (ctx.parsed.y*100).toFixed(1)+"%"),
   });
   new Chart(document.getElementById("m1_2"), {
     type: "bar",
-    data: { labels: impls, datasets: [{ data: [18.00,18.00,27.00], backgroundColor: impls.map(bg) }] },
+    data: { labels: impls, datasets: [{ data: [5816.00,187608.00,275497.00], backgroundColor: impls.map(bg) }] },
     options: chartOpts(fmtBytes, ctx => ctx.label+": "+fmtBytes(ctx.parsed.y)),
   });
   new Chart(document.getElementById("a1_2"), {
     type: "bar",
-    data: { labels: impls, datasets: [{ data: [0.00,0.00,0.00], backgroundColor: impls.map(bg) }] },
+    data: { labels: impls, datasets: [{ data: [4.00,690.00,1009.00], backgroundColor: impls.map(bg) }] },
     options: chartOpts(v => v.toFixed(0), ctx => ctx.label+": "+ctx.parsed.y.toFixed(0)+" allocs"),
   });
   
   new Chart(document.getElementById("c1_3"), {
     type: "bar",
-    data: { labels: impls, datasets: [{ data: [1.00,0.81,1.03], backgroundColor: impls.map(bg) }] },
+    data: { labels: impls, datasets: [{ data: [1.00,1741.70,3215.12], backgroundColor: impls.map(bg) }] },
     options: chartOpts(v => (v*100).toFixed(0)+"%", ctx => (ctx.parsed.y*100).toFixed(1)+"%"),
   });
   new Chart(document.getElementById("m1_3"), {
     type: "bar",
-    data: { labels: impls, datasets: [{ data: [24.00,24.00,24.00], backgroundColor: impls.map(bg) }] },
+    data: { labels: impls, datasets: [{ data: [5818.00,1863344.00,2761207.00], backgroundColor: impls.map(bg) }] },
     options: chartOpts(fmtBytes, ctx => ctx.label+": "+fmtBytes(ctx.parsed.y)),
   });
   new Chart(document.getElementById("a1_3"), {
     type: "bar",
-    data: { labels: impls, datasets: [{ data: [2.00,2.00,2.00], backgroundColor: impls.map(bg) }] },
+    data: { labels: impls, datasets: [{ data: [4.00,6687.00,9907.00], backgroundColor: impls.map(bg) }] },
     options: chartOpts(v => v.toFixed(0), ctx => ctx.label+": "+ctx.parsed.y.toFixed(0)+" allocs"),
   });
   
   new Chart(document.getElementById("c1_4"), {
     type: "bar",
-    data: { labels: impls, datasets: [{ data: [1.00,0.82,1.15], backgroundColor: impls.map(bg) }] },
+    data: { labels: impls, datasets: [{ data: [1.00,1.50,2.22], backgroundColor: impls.map(bg) }] },
     options: chartOpts(v => (v*100).toFixed(0)+"%", ctx => (ctx.parsed.y*100).toFixed(1)+"%"),
   });
   new Chart(document.getElementById("m1_4"), {
     type: "bar",
-    data: { labels: impls, datasets: [{ data: [24.00,24.00,24.00], backgroundColor: impls.map(bg) }] },
+    data: { labels: impls, datasets: [{ data: [48.00,3416.00,3232.00], backgroundColor: impls.map(bg) }] },
     options: chartOpts(fmtBytes, ctx => ctx.label+": "+fmtBytes(ctx.parsed.y)),
   });
   new Chart(document.getElementById("a1_4"), {
     type: "bar",
-    data: { labels: impls, datasets: [{ data: [2.00,2.00,2.00], backgroundColor: impls.map(bg) }] },
+    data: { labels: impls, datasets: [{ data: [1.00,21.00,24.00], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(v => v.toFixed(0), ctx => ctx.label+": "+ctx.parsed.y.toFixed(0)+" allocs"),
+  });
+  
+  new Chart(document.getElementById("c1_5"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [1.00,1.17,1.97], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(v => (v*100).toFixed(0)+"%", ctx => (ctx.parsed.y*100).toFixed(1)+"%"),
+  });
+  new Chart(document.getElementById("m1_5"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [48.00,20024.00,27456.00], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(fmtBytes, ctx => ctx.label+": "+fmtBytes(ctx.parsed.y)),
+  });
+  new Chart(document.getElementById("a1_5"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [1.00,84.00,115.00], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(v => v.toFixed(0), ctx => ctx.label+": "+ctx.parsed.y.toFixed(0)+" allocs"),
+  });
+  
+  new Chart(document.getElementById("c1_6"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [1.00,1.21,2.08], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(v => (v*100).toFixed(0)+"%", ctx => (ctx.parsed.y*100).toFixed(1)+"%"),
+  });
+  new Chart(document.getElementById("m1_6"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [51.50,189145.00,275497.00], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(fmtBytes, ctx => ctx.label+": "+fmtBytes(ctx.parsed.y)),
+  });
+  new Chart(document.getElementById("a1_6"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [1.00,693.00,1009.00], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(v => v.toFixed(0), ctx => ctx.label+": "+ctx.parsed.y.toFixed(0)+" allocs"),
+  });
+  
+  new Chart(document.getElementById("c1_7"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [1.00,1.17,2.11], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(v => (v*100).toFixed(0)+"%", ctx => (ctx.parsed.y*100).toFixed(1)+"%"),
+  });
+  new Chart(document.getElementById("m1_7"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [104.00,1865390.00,2760694.50], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(fmtBytes, ctx => ctx.label+": "+fmtBytes(ctx.parsed.y)),
+  });
+  new Chart(document.getElementById("a1_7"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [1.00,6691.00,9906.00], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(v => v.toFixed(0), ctx => ctx.label+": "+ctx.parsed.y.toFixed(0)+" allocs"),
+  });
+  
+  new Chart(document.getElementById("c1_8"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [1.00,2.05,2.08], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(v => (v*100).toFixed(0)+"%", ctx => (ctx.parsed.y*100).toFixed(1)+"%"),
+  });
+  new Chart(document.getElementById("m1_8"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [224.00,2072.00,2072.00], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(fmtBytes, ctx => ctx.label+": "+fmtBytes(ctx.parsed.y)),
+  });
+  new Chart(document.getElementById("a1_8"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [1.00,9.00,9.00], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(v => v.toFixed(0), ctx => ctx.label+": "+ctx.parsed.y.toFixed(0)+" allocs"),
+  });
+  
+  new Chart(document.getElementById("c1_9"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [1.00,2.29,2.10], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(v => (v*100).toFixed(0)+"%", ctx => (ctx.parsed.y*100).toFixed(1)+"%"),
+  });
+  new Chart(document.getElementById("m1_9"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [224.00,25240.00,25240.00], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(fmtBytes, ctx => ctx.label+": "+fmtBytes(ctx.parsed.y)),
+  });
+  new Chart(document.getElementById("a1_9"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [1.00,13.00,13.00], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(v => v.toFixed(0), ctx => ctx.label+": "+ctx.parsed.y.toFixed(0)+" allocs"),
+  });
+  
+  new Chart(document.getElementById("c1_10"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [1.00,2.59,2.35], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(v => (v*100).toFixed(0)+"%", ctx => (ctx.parsed.y*100).toFixed(1)+"%"),
+  });
+  new Chart(document.getElementById("m1_10"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [224.00,357657.00,357657.00], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(fmtBytes, ctx => ctx.label+": "+fmtBytes(ctx.parsed.y)),
+  });
+  new Chart(document.getElementById("a1_10"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [1.00,20.00,20.00], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(v => v.toFixed(0), ctx => ctx.label+": "+ctx.parsed.y.toFixed(0)+" allocs"),
+  });
+  
+  new Chart(document.getElementById("c1_11"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [1.00,2.36,2.12], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(v => (v*100).toFixed(0)+"%", ctx => (ctx.parsed.y*100).toFixed(1)+"%"),
+  });
+  new Chart(document.getElementById("m1_11"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [224.00,4101409.00,4101409.00], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(fmtBytes, ctx => ctx.label+": "+fmtBytes(ctx.parsed.y)),
+  });
+  new Chart(document.getElementById("a1_11"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [1.00,29.00,29.00], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(v => v.toFixed(0), ctx => ctx.label+": "+ctx.parsed.y.toFixed(0)+" allocs"),
+  });
+  
+  new Chart(document.getElementById("c1_12"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [1.00,2.22,2.34], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(v => (v*100).toFixed(0)+"%", ctx => (ctx.parsed.y*100).toFixed(1)+"%"),
+  });
+  new Chart(document.getElementById("m1_12"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [224.00,2072.00,2072.00], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(fmtBytes, ctx => ctx.label+": "+fmtBytes(ctx.parsed.y)),
+  });
+  new Chart(document.getElementById("a1_12"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [1.00,9.00,9.00], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(v => v.toFixed(0), ctx => ctx.label+": "+ctx.parsed.y.toFixed(0)+" allocs"),
+  });
+  
+  new Chart(document.getElementById("c1_13"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [1.00,2.51,2.33], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(v => (v*100).toFixed(0)+"%", ctx => (ctx.parsed.y*100).toFixed(1)+"%"),
+  });
+  new Chart(document.getElementById("m1_13"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [224.00,25240.00,25240.00], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(fmtBytes, ctx => ctx.label+": "+fmtBytes(ctx.parsed.y)),
+  });
+  new Chart(document.getElementById("a1_13"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [1.00,13.00,13.00], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(v => v.toFixed(0), ctx => ctx.label+": "+ctx.parsed.y.toFixed(0)+" allocs"),
+  });
+  
+  new Chart(document.getElementById("c1_14"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [1.00,2.83,2.57], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(v => (v*100).toFixed(0)+"%", ctx => (ctx.parsed.y*100).toFixed(1)+"%"),
+  });
+  new Chart(document.getElementById("m1_14"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [224.00,357657.00,357657.50], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(fmtBytes, ctx => ctx.label+": "+fmtBytes(ctx.parsed.y)),
+  });
+  new Chart(document.getElementById("a1_14"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [1.00,20.00,20.00], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(v => v.toFixed(0), ctx => ctx.label+": "+ctx.parsed.y.toFixed(0)+" allocs"),
+  });
+  
+  new Chart(document.getElementById("c1_15"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [1.00,2.54,2.25], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(v => (v*100).toFixed(0)+"%", ctx => (ctx.parsed.y*100).toFixed(1)+"%"),
+  });
+  new Chart(document.getElementById("m1_15"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [224.00,4101408.50,4101408.50], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(fmtBytes, ctx => ctx.label+": "+fmtBytes(ctx.parsed.y)),
+  });
+  new Chart(document.getElementById("a1_15"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [1.00,29.00,29.00], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(v => v.toFixed(0), ctx => ctx.label+": "+ctx.parsed.y.toFixed(0)+" allocs"),
+  });
+  
+  new Chart(document.getElementById("c1_16"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [1.00,0.72,0.74], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(v => (v*100).toFixed(0)+"%", ctx => (ctx.parsed.y*100).toFixed(1)+"%"),
+  });
+  new Chart(document.getElementById("m1_16"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [224.00,2072.00,2072.00], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(fmtBytes, ctx => ctx.label+": "+fmtBytes(ctx.parsed.y)),
+  });
+  new Chart(document.getElementById("a1_16"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [1.00,9.00,9.00], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(v => v.toFixed(0), ctx => ctx.label+": "+ctx.parsed.y.toFixed(0)+" allocs"),
+  });
+  
+  new Chart(document.getElementById("c1_17"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [1.00,0.58,0.55], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(v => (v*100).toFixed(0)+"%", ctx => (ctx.parsed.y*100).toFixed(1)+"%"),
+  });
+  new Chart(document.getElementById("m1_17"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [224.00,25240.00,25240.00], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(fmtBytes, ctx => ctx.label+": "+fmtBytes(ctx.parsed.y)),
+  });
+  new Chart(document.getElementById("a1_17"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [1.00,13.00,13.00], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(v => v.toFixed(0), ctx => ctx.label+": "+ctx.parsed.y.toFixed(0)+" allocs"),
+  });
+  
+  new Chart(document.getElementById("c1_18"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [1.00,0.59,0.58], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(v => (v*100).toFixed(0)+"%", ctx => (ctx.parsed.y*100).toFixed(1)+"%"),
+  });
+  new Chart(document.getElementById("m1_18"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [224.00,357656.50,357656.00], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(fmtBytes, ctx => ctx.label+": "+fmtBytes(ctx.parsed.y)),
+  });
+  new Chart(document.getElementById("a1_18"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [1.00,20.00,20.00], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(v => v.toFixed(0), ctx => ctx.label+": "+ctx.parsed.y.toFixed(0)+" allocs"),
+  });
+  
+  new Chart(document.getElementById("c1_19"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [1.00,0.65,0.64], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(v => (v*100).toFixed(0)+"%", ctx => (ctx.parsed.y*100).toFixed(1)+"%"),
+  });
+  new Chart(document.getElementById("m1_19"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [224.00,4101409.50,4101409.50], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(fmtBytes, ctx => ctx.label+": "+fmtBytes(ctx.parsed.y)),
+  });
+  new Chart(document.getElementById("a1_19"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [1.00,29.00,29.00], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(v => v.toFixed(0), ctx => ctx.label+": "+ctx.parsed.y.toFixed(0)+" allocs"),
+  });
+  
+  new Chart(document.getElementById("c1_20"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [1.00,0.83,1.32], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(v => (v*100).toFixed(0)+"%", ctx => (ctx.parsed.y*100).toFixed(1)+"%"),
+  });
+  new Chart(document.getElementById("m1_20"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [1200.00,2904.00,3232.00], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(fmtBytes, ctx => ctx.label+": "+fmtBytes(ctx.parsed.y)),
+  });
+  new Chart(document.getElementById("a1_20"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [2.00,20.00,24.00], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(v => v.toFixed(0), ctx => ctx.label+": "+ctx.parsed.y.toFixed(0)+" allocs"),
+  });
+  
+  new Chart(document.getElementById("c1_21"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [1.00,0.55,1.05], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(v => (v*100).toFixed(0)+"%", ctx => (ctx.parsed.y*100).toFixed(1)+"%"),
+  });
+  new Chart(document.getElementById("m1_21"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [19658.00,19512.00,27456.00], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(fmtBytes, ctx => ctx.label+": "+fmtBytes(ctx.parsed.y)),
+  });
+  new Chart(document.getElementById("a1_21"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [17.00,83.00,115.00], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(v => v.toFixed(0), ctx => ctx.label+": "+ctx.parsed.y.toFixed(0)+" allocs"),
+  });
+  
+  new Chart(document.getElementById("c1_22"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [1.00,0.56,1.08], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(v => (v*100).toFixed(0)+"%", ctx => (ctx.parsed.y*100).toFixed(1)+"%"),
+  });
+  new Chart(document.getElementById("m1_22"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [186930.00,187609.00,275497.00], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(fmtBytes, ctx => ctx.label+": "+fmtBytes(ctx.parsed.y)),
+  });
+  new Chart(document.getElementById("a1_22"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [160.00,690.00,1009.00], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(v => v.toFixed(0), ctx => ctx.label+": "+ctx.parsed.y.toFixed(0)+" allocs"),
+  });
+  
+  new Chart(document.getElementById("c1_23"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [1.00,0.57,1.03], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(v => (v*100).toFixed(0)+"%", ctx => (ctx.parsed.y*100).toFixed(1)+"%"),
+  });
+  new Chart(document.getElementById("m1_23"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [1860354.00,1862831.50,2760696.50], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(fmtBytes, ctx => ctx.label+": "+fmtBytes(ctx.parsed.y)),
+  });
+  new Chart(document.getElementById("a1_23"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [1590.00,6686.00,9906.00], backgroundColor: impls.map(bg) }] },
     options: chartOpts(v => v.toFixed(0), ctx => ctx.label+": "+ctx.parsed.y.toFixed(0)+" allocs"),
   });
   
@@ -543,63 +978,167 @@
   
   new Chart(document.getElementById("c2_0"), {
     type: "bar",
-    data: { labels: impls, datasets: [{ data: [1.00,3.13,2.76], backgroundColor: impls.map(bg) }] },
+    data: { labels: impls, datasets: [{ data: [1.00,0.77,1.17], backgroundColor: impls.map(bg) }] },
     options: chartOpts(v => (v*100).toFixed(0)+"%", ctx => (ctx.parsed.y*100).toFixed(1)+"%"),
   });
   new Chart(document.getElementById("m2_0"), {
     type: "bar",
-    data: { labels: impls, datasets: [{ data: [224.00,4101441.50,4101442.00], backgroundColor: impls.map(bg) }] },
+    data: { labels: impls, datasets: [{ data: [0.00,0.00,0.00], backgroundColor: impls.map(bg) }] },
     options: chartOpts(fmtBytes, ctx => ctx.label+": "+fmtBytes(ctx.parsed.y)),
   });
   new Chart(document.getElementById("a2_0"), {
     type: "bar",
-    data: { labels: impls, datasets: [{ data: [1.00,29.00,29.00], backgroundColor: impls.map(bg) }] },
+    data: { labels: impls, datasets: [{ data: [0.00,0.00,0.00], backgroundColor: impls.map(bg) }] },
     options: chartOpts(v => v.toFixed(0), ctx => ctx.label+": "+ctx.parsed.y.toFixed(0)+" allocs"),
   });
   
   new Chart(document.getElementById("c2_1"), {
     type: "bar",
-    data: { labels: impls, datasets: [{ data: [1.00,0.78,0.77], backgroundColor: impls.map(bg) }] },
+    data: { labels: impls, datasets: [{ data: [1.00,268.95,536.81], backgroundColor: impls.map(bg) }] },
     options: chartOpts(v => (v*100).toFixed(0)+"%", ctx => (ctx.parsed.y*100).toFixed(1)+"%"),
   });
   new Chart(document.getElementById("m2_1"), {
     type: "bar",
-    data: { labels: impls, datasets: [{ data: [0.00,0.00,0.00], backgroundColor: impls.map(bg) }] },
+    data: { labels: impls, datasets: [{ data: [3511.00,187609.00,275497.00], backgroundColor: impls.map(bg) }] },
     options: chartOpts(fmtBytes, ctx => ctx.label+": "+fmtBytes(ctx.parsed.y)),
   });
   new Chart(document.getElementById("a2_1"), {
     type: "bar",
-    data: { labels: impls, datasets: [{ data: [0.00,0.00,0.00], backgroundColor: impls.map(bg) }] },
+    data: { labels: impls, datasets: [{ data: [3.00,690.00,1009.00], backgroundColor: impls.map(bg) }] },
     options: chartOpts(v => v.toFixed(0), ctx => ctx.label+": "+ctx.parsed.y.toFixed(0)+" allocs"),
   });
   
   new Chart(document.getElementById("c2_2"), {
     type: "bar",
-    data: { labels: impls, datasets: [{ data: [1.00,6253.07,5021.57], backgroundColor: impls.map(bg) }] },
+    data: { labels: impls, datasets: [{ data: [1.00,0.59,0.99], backgroundColor: impls.map(bg) }] },
     options: chartOpts(v => (v*100).toFixed(0)+"%", ctx => (ctx.parsed.y*100).toFixed(1)+"%"),
   });
   new Chart(document.getElementById("m2_2"), {
     type: "bar",
-    data: { labels: impls, datasets: [{ data: [224.00,4101440.50,4101437.50], backgroundColor: impls.map(bg) }] },
+    data: { labels: impls, datasets: [{ data: [18.00,18.00,27.00], backgroundColor: impls.map(bg) }] },
     options: chartOpts(fmtBytes, ctx => ctx.label+": "+fmtBytes(ctx.parsed.y)),
   });
   new Chart(document.getElementById("a2_2"), {
     type: "bar",
-    data: { labels: impls, datasets: [{ data: [1.00,29.00,29.00], backgroundColor: impls.map(bg) }] },
+    data: { labels: impls, datasets: [{ data: [0.00,0.00,0.00], backgroundColor: impls.map(bg) }] },
     options: chartOpts(v => v.toFixed(0), ctx => ctx.label+": "+ctx.parsed.y.toFixed(0)+" allocs"),
   });
   
   new Chart(document.getElementById("c2_3"), {
     type: "bar",
-    data: { labels: impls, datasets: [{ data: [1.00,1.64,1.17], backgroundColor: impls.map(bg) }] },
+    data: { labels: impls, datasets: [{ data: [1.00,0.78,1.04], backgroundColor: impls.map(bg) }] },
     options: chartOpts(v => (v*100).toFixed(0)+"%", ctx => (ctx.parsed.y*100).toFixed(1)+"%"),
   });
   new Chart(document.getElementById("m2_3"), {
     type: "bar",
-    data: { labels: impls, datasets: [{ data: [0.00,0.00,0.00], backgroundColor: impls.map(bg) }] },
+    data: { labels: impls, datasets: [{ data: [24.00,24.00,24.00], backgroundColor: impls.map(bg) }] },
     options: chartOpts(fmtBytes, ctx => ctx.label+": "+fmtBytes(ctx.parsed.y)),
   });
   new Chart(document.getElementById("a2_3"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [2.00,2.00,2.00], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(v => v.toFixed(0), ctx => ctx.label+": "+ctx.parsed.y.toFixed(0)+" allocs"),
+  });
+  
+  new Chart(document.getElementById("c2_4"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [1.00,0.80,1.18], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(v => (v*100).toFixed(0)+"%", ctx => (ctx.parsed.y*100).toFixed(1)+"%"),
+  });
+  new Chart(document.getElementById("m2_4"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [24.00,24.00,24.00], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(fmtBytes, ctx => ctx.label+": "+fmtBytes(ctx.parsed.y)),
+  });
+  new Chart(document.getElementById("a2_4"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [2.00,2.00,2.00], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(v => v.toFixed(0), ctx => ctx.label+": "+ctx.parsed.y.toFixed(0)+" allocs"),
+  });
+  
+})();
+
+(function(){
+  const impls  = ["ajwerner","tidwall","google"];
+  const colors = {
+    "ajwerner": "rgba(54,162,235,0.8)",
+    "tidwall":  "rgba(255,99,132,0.8)",
+    "google":   "rgba(75,192,100,0.8)",
+  };
+  const bg = impl => colors[impl] || "rgba(153,102,255,0.8)";
+  function fmtBytes(v) {
+    if (v >= 1048576) return (v/1048576).toFixed(2)+" MiB";
+    if (v >= 1024)    return (v/1024).toFixed(1)+" KiB";
+    return v.toFixed(0)+" B";
+  }
+  const chartOpts = (fmtTick, fmtTip) => ({
+    responsive: true,
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: ctx => fmtTip(ctx) } },
+    },
+    scales: { y: { ticks: { callback: fmtTick } } },
+  });
+  
+  new Chart(document.getElementById("c3_0"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [1.00,3.21,2.84], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(v => (v*100).toFixed(0)+"%", ctx => (ctx.parsed.y*100).toFixed(1)+"%"),
+  });
+  new Chart(document.getElementById("m3_0"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [224.00,4101424.00,4101417.00], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(fmtBytes, ctx => ctx.label+": "+fmtBytes(ctx.parsed.y)),
+  });
+  new Chart(document.getElementById("a3_0"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [1.00,29.00,29.00], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(v => v.toFixed(0), ctx => ctx.label+": "+ctx.parsed.y.toFixed(0)+" allocs"),
+  });
+  
+  new Chart(document.getElementById("c3_1"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [1.00,0.78,0.78], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(v => (v*100).toFixed(0)+"%", ctx => (ctx.parsed.y*100).toFixed(1)+"%"),
+  });
+  new Chart(document.getElementById("m3_1"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [0.00,0.00,0.00], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(fmtBytes, ctx => ctx.label+": "+fmtBytes(ctx.parsed.y)),
+  });
+  new Chart(document.getElementById("a3_1"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [0.00,0.00,0.00], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(v => v.toFixed(0), ctx => ctx.label+": "+ctx.parsed.y.toFixed(0)+" allocs"),
+  });
+  
+  new Chart(document.getElementById("c3_2"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [1.00,5622.20,4669.58], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(v => (v*100).toFixed(0)+"%", ctx => (ctx.parsed.y*100).toFixed(1)+"%"),
+  });
+  new Chart(document.getElementById("m3_2"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [224.00,4101421.00,4101412.00], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(fmtBytes, ctx => ctx.label+": "+fmtBytes(ctx.parsed.y)),
+  });
+  new Chart(document.getElementById("a3_2"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [1.00,29.00,29.00], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(v => v.toFixed(0), ctx => ctx.label+": "+ctx.parsed.y.toFixed(0)+" allocs"),
+  });
+  
+  new Chart(document.getElementById("c3_3"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [1.00,1.80,1.19], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(v => (v*100).toFixed(0)+"%", ctx => (ctx.parsed.y*100).toFixed(1)+"%"),
+  });
+  new Chart(document.getElementById("m3_3"), {
+    type: "bar",
+    data: { labels: impls, datasets: [{ data: [0.00,0.00,0.00], backgroundColor: impls.map(bg) }] },
+    options: chartOpts(fmtBytes, ctx => ctx.label+": "+fmtBytes(ctx.parsed.y)),
+  });
+  new Chart(document.getElementById("a3_3"), {
     type: "bar",
     data: { labels: impls, datasets: [{ data: [0.00,0.00,0.00], backgroundColor: impls.map(bg) }] },
     options: chartOpts(v => v.toFixed(0), ctx => ctx.label+": "+ctx.parsed.y.toFixed(0)+" allocs"),

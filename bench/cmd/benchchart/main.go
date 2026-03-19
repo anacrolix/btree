@@ -68,13 +68,13 @@ func parseLine(line string) (result, bool) {
 		}
 	}
 
-	parts := strings.SplitN(name, "/", 3)
-	if len(parts) != 3 {
+	parts := strings.Split(name, "/")
+	if len(parts) < 3 {
 		return result{}, false
 	}
 	group := strings.TrimPrefix(parts[0], "Benchmark")
-	op := parts[1]
-	impl := parts[2]
+	impl := parts[len(parts)-1]
+	op := strings.Join(parts[1:len(parts)-1], "/") // e.g. "UpsertBySize/n=100"
 
 	// Find ns/op, B/op, and allocs/op values
 	var nsOp, bOp, allocsOp float64
@@ -148,7 +148,7 @@ func main() {
 	}
 
 	// Determine stable ordering: groups, ops, impls
-	groupOrder := []string{"Google", "Tidwall", "Local"}
+	groupOrder := []string{"Google", "Erigon", "Tidwall", "Local"}
 	var groups []chartData
 	for _, g := range groupOrder {
 		ops, ok := all[g]
