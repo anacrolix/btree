@@ -19,11 +19,15 @@ The `orderstat` package provides order-statistic trees that support O(log n) ran
 
 ## Benchmarks
 
-The [`bench/`](bench/) directory contains 22 comparative benchmarks across three groups (Google test suite, Tidwall test suite, Local) against [tidwall/btree](https://github.com/tidwall/btree) and [google/btree](https://github.com/google/btree).
+The [`bench/`](bench/) submodule (`github.com/anacrolix/btree/bench`) compares this library against [tidwall/btree](https://github.com/tidwall/btree) and [google/btree](https://github.com/google/btree) across three benchmark groups:
 
-**[Interactive chart](https://htmlpreview.github.io/?https://github.com/anacrolix/btree/blob/main/bench/results/chart.html)** — runtime, B/op, and allocs/op per benchmark.
+| Group | Source |
+|---|---|
+| `BenchmarkGoogle` | Ported from `google/btree` test suite |
+| `BenchmarkTidwall` | Ported from `tidwall/btree-benchmark` |
+| `BenchmarkLocal` | Original benchmarks for cursor and upsert operations |
 
-See [`bench/README.md`](bench/README.md) for full results and usage.
+**[Interactive chart](https://anacrolix.github.io/btree/)** — runtime, B/op, and allocs/op per benchmark, updated on each push to main.
 
 ## License
 
